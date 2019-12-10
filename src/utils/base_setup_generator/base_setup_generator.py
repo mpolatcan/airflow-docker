@@ -17,7 +17,7 @@ class Constants:
     CONFIG_LOADER_STD_STATEMENT_FMT = "load_config \"{property}\" \"${{{env_var_name}}}\" \"{config_filename}\""
     CONFIG_LOADER_SUBST_STATEMENT_FMT = "load_config \"{property}\" \"{substitution}\" \"{config_filename}\""
     CONFIG_LOADER_OPT_SUBST_STATEMENT_FMT = "load_config_with_opt \"{property}\" \"{check}\" \"{substitution_not_null}\" \"{substitution_null}\" \"{config_filename}\""
-    CONFIG_LOADER_SECTION_STATEMENT_FMT = "\nprintf \"\\n{section}\\n\" {op} \"{config_filename}\""
+    CONFIG_LOADER_SECTION_STATEMENT_FMT = "\nprintf \"\\n{section}\\n\" {op} \"${{AIRFLOW_CONF_DIR}}/{config_filename}\""
     CONFIGURATION_SECTION_KEY_REGEX = re.compile("<[a-z_A-Z]+>")
 
 
