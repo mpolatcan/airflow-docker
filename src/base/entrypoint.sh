@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Load Airflow configurations and save it "airflow.cfg"
-./config_loader.sh
+./airflow_config_loader.sh
 
 if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
   for daemon in ${AIRFLOW_DAEMONS[@]}; do

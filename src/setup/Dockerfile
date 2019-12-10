@@ -11,4 +11,4 @@ RUN ${AIRFLOW_VIRTUALENV}/pip3 install apache-airflow[all]==${AIRFLOW_VERSION} &
 
 USER airflow
 WORKDIR ${AIRFLOW_USER_HOME}
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./airflow_entrypoint.sh"]
