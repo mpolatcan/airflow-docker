@@ -4,9 +4,12 @@
 ./config_loader.sh
 
 if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
-  airflow initdb
-
   for daemon in ${AIRFLOW_DAEMONS[@]}; do
+    if [[ "$daemon" == "scheduler" ]]; then
+      echo "Initializing Airflow database..."
+      airflow initdb
+    fi
+
     airflow $daemon &
   done
 
