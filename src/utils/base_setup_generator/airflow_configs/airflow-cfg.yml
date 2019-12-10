@@ -47,7 +47,7 @@
     processor:
       manager:
         log:
-          location: "/root/airflow/logs/dag_processor_manager/dag_processor_manager.log"
+          location: "=${AIRFLOW_HOME}/logs/dag_processor_manager/dag_processor_manager.log"
     concurrency: "16"
     file:
       processor:
@@ -90,7 +90,7 @@
   load:
     examples: "True"
   plugins:
-    folder: "/root/airflow/plugins"
+    folder: "=${AIRFLOW_HOME}/airflow/plugins"
   fernet:
     key: "=$(python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\")"
   donot:
@@ -315,7 +315,7 @@
   child:
     process:
       log:
-        directory: "/root/airflow/logs/scheduler"
+        directory: "=${AIRFLOW_HOME}/logs/scheduler"
   catchup:
     by:
       default: "True"
