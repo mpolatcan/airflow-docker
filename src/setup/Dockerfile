@@ -1,4 +1,6 @@
-FROM mpolatcan/airflow:base
+ARG PYTHON_VERSION=""
+
+FROM mpolatcan/airflow:base-python${PYTHON_VERSION}
 
 MAINTAINER Mutlu Polatcan <mutlupolatcan@gmail.com>
 

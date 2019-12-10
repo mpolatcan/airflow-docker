@@ -1,5 +1,7 @@
 base_dockerfile_template: |
-  FROM python:3.6
+  ARG PYTHON_VERSION=""
+
+  FROM python:${{PYTHON_VERSION}}
 
   MAINTAINER Mutlu Polatcan <mutlupolatcan@gmail.com>
 
@@ -8,18 +10,13 @@ base_dockerfile_template: |
       AIRFLOW_DAEMONS="NULL" \
   {env_vars}
 
-  WORKDIR ${{AIRFLOW_HOME}}
-
   ADD entrypoint.sh config_loader.sh ./
 
   RUN apt-get update && \
-      apt-get -y install --no-install-recommends gcc g++ default-libmysqlclient-dev libkrb5-dev libsasl2-dev && \
+      apt-get -y install --no-install-recommends nano gcc g++ default-libmysqlclient-dev libkrb5-dev libsasl2-dev && \
       rm -rf /var/lib/apt/lists/* && \
       pip3 install "pymssql<3.0" && \
-      pip3 install apache-airflow[all] && \
       chmod +x config_loader.sh entrypoint.sh
-
-  ENTRYPOINT ["./entrypoint.sh"]
 
 config_loader_sh_template: |
   #!/usr/bin/env bash
@@ -46,4 +43,4 @@ config_files:
   - path: airflow_configs/airflow-cfg.yml
     filename: airflow.cfg
 
-output_dir: ../../setup
+output_dir: ../../base

@@ -228,7 +228,6 @@ ENV AIRFLOW_CONF_DIR="${AIRFLOW_HOME}" \
 	KUBERNETES_RUN_AS_USER="NULL" \
 	KUBERNETES_FS_GROUP="NULL"
 
-
 ADD entrypoint.sh config_loader.sh ./
 
 RUN apt-get update && \
@@ -236,5 +235,3 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install "pymssql<3.0" && \
     chmod +x config_loader.sh entrypoint.sh
-
-WORKDIR ${AIRFLOW_HOME}
