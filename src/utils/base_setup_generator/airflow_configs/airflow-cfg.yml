@@ -1,0 +1,505 @@
+<core>:
+  dags:
+    folder: "NULL"
+    are:
+      paused:
+        at:
+          creation: "True"
+  base:
+    log:
+      folder: "NULL"
+  remote:
+    logging: "False"
+    log:
+      conn:
+        id: "NULL"
+    base:
+      log:
+        folder: "NULL"
+  encrypt:
+    s3:
+      logs: "False"
+  logging:
+    level: "INFO"
+    config:
+      class: "NULL"
+  fab:
+    logging:
+      level: "WARN"
+  colored:
+    console:
+      log: "True"
+    log:
+      format: "[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s"
+    formatter:
+      class: "airflow.utils.log.colored_log.CustomTTYColoredFormatter"
+  log:
+    format: "[%%%%(asctime)s] {%%%%(filename)s:%%%%(lineno)d} %%%%(levelname)s - %%%%(message)s"
+    filename:
+      template: "{{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log"
+    processor:
+      filename:
+        template: "{{ filename }}.log"
+  simple:
+    log:
+      format: "%%%%(asctime)s %%%%(levelname)s - %%%%(message)s"
+  dag:
+    processor:
+      manager:
+        log:
+          location: "/root/airflow/logs/dag_processor_manager/dag_processor_manager.log"
+    concurrency: "16"
+    file:
+      processor:
+        timeout: "50"
+    run:
+      conf:
+        overrides:
+          params: "False"
+    discovery:
+      safe:
+        mode: "True"
+  hostname:
+    callable: "socket:getfqdn"
+  default:
+    timezone: "utc"
+    impersonation: "NULL"
+    task:
+      retries: "0"
+  executor: "SequentialExecutor"
+  sql:
+    alchemy:
+      conn: "sqlite:////root/airflow/airflow.db"
+      pool:
+        enabled: "True"
+        size: "5"
+        recycle: "1800"
+        pre:
+          ping: "True"
+      max:
+        overflow: "10"
+      schema: "NULL"
+    engine:
+      encoding: "utf-8"
+  parallelism: "32"
+  max:
+    active:
+      runs:
+        per:
+          dag: "16"
+  load:
+    examples: "True"
+  plugins:
+    folder: "/root/airflow/plugins"
+  fernet:
+    key: "=$(python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\")"
+  donot:
+    pickle: "False"
+  dagbag:
+    import:
+      timeout: "30"
+  task:
+    runner: "StandardTaskRunner"
+    log:
+      reader: "task"
+  security: "NULL"
+  secure:
+    mode: "False"
+  unit:
+    test:
+      mode: "False"
+  enable:
+    xcom:
+      pickling: "True"
+  killed:
+    task:
+      cleanup:
+        time: "60"
+  worker:
+    precheck: "False"
+
+<cli>:
+  api:
+    client: "airflow.api.client.local_client"
+  endpoint:
+    url: "http://localhost:8080"
+
+<api>:
+  auth:
+    backend: "airflow.api.auth.backend.default"
+
+<lineage>:
+  backend: ""
+
+<atlas>:
+  sasl:
+    enabled: "False"
+  host: "NULL"
+  port: "21000"
+  username: "NULL"
+  password: "NULL"
+
+<operators>:
+  default:
+    owner: "airflow"
+    cpus: "1"
+    ram: "512"
+    disk: "612"
+    gpus: "0"
+
+<hive>:
+  default:
+    hive:
+      mapred:
+        queue: "NULL"
+
+<webserver>:
+  base:
+    url: "http://localhost:8080"
+  web:
+    server:
+      host: "0.0.0.0"
+      port: "8080"
+      ssl:
+        cert: "NULL"
+        key: "NULL"
+      master:
+        timeout: "120"
+      worker:
+        timeout: "120"
+  worker:
+    refresh:
+      batch:
+        size: "1"
+      interval: "30"
+    class: "sync"
+  secret:
+    key: "temporary_key"
+  workers: "4"
+  access:
+    logfile: "-"
+  error:
+    logfile: "-"
+  expose:
+    config: "False"
+  authenticate: "False"
+  filter:
+    by:
+      owner: "False"
+  owner:
+    mode: "user"
+  dag:
+    default:
+      view: "tree"
+    orientation: "LR"
+  demo:
+    mode: "False"
+  log:
+    fetch:
+      timeout:
+        sec: "5"
+  hide:
+    paused:
+      dags:
+        by:
+          default: "False"
+  page:
+    size: "100"
+  rbac: "False"
+  navbar:
+    color: "#007A87"
+  default:
+    dag:
+      run:
+        display:
+          number: "25"
+    wrap: "False"
+  enable:
+    proxy:
+      fix: "False"
+  cookie:
+    secure: "False"
+    samesite: "NULL"
+
+<email>:
+  email:
+    backend: "airflow.utils.email.send_email_smtp"
+
+<smtp>:
+  smtp:
+    host: "localhost"
+    starttls: "True"
+    ssl: "False"
+    user: "airflow"
+    password: "airflow"
+    port: "25"
+    mail:
+      from: "airflow@example.com"
+
+<sentry>:
+  sentry:
+    dsn: "NULL"
+
+<celery>:
+  celery:
+    app:
+      name: "airflow.executors.celery_executor"
+    config:
+      options: "airflow.config_templates.default_celery.DEFAULT_CELERY_CONFIG"
+  worker:
+    concurrency: "16"
+    log:
+      server:
+        port: "8793"
+  broker:
+    url: "sqla+mysql://airflow:airflow@localhost:3306/airflow"
+  result:
+    backend: "db+mysql://airflow:airflow@localhost:3306/airflow"
+  flower:
+    host: "0.0.0.0"
+    url:
+      prefix: "NULL"
+    port: "5555"
+    basic:
+      auth: "NULL"
+  default:
+    queue: "default"
+  sync:
+    parallelism: "0"
+  ssl:
+    active: "False"
+    key: "NULL"
+    cert: "NULL"
+    cacert: "NULL"
+  pool: "prefork"
+
+<dask>:
+  cluster:
+    address: "127.0.0.1:8766"
+  tls:
+    ca: "NULL"
+    cert: "NULL"
+    key: "NULL"
+
+<scheduler>:
+  job:
+    heartbeat:
+      sec: "5"
+  scheduler:
+    heartbeat:
+      sec: "5"
+    health:
+      check:
+        threshold: "30"
+    zombie:
+      task:
+        threshold: "300"
+  run:
+    duration: "-1"
+  num:
+    runs: "-1"
+  processor:
+    poll:
+      interval: "1"
+  min:
+    file:
+      process:
+        interval: "0"
+  dag:
+    dir:
+      list:
+        interval: "300"
+  print:
+    stats:
+      interval: "30"
+  child:
+    process:
+      log:
+        directory: "/root/airflow/logs/scheduler"
+  catchup:
+    by:
+      default: "True"
+  max:
+    tis:
+      per:
+        query: "512"
+    threads: "2"
+  statsd:
+    "on": "False"
+    host: "localhost"
+    port: "8125"
+    prefix: "airflow"
+    allow:
+      list: "NULL"
+  authenticate: "False"
+  use:
+    job:
+      schedule: "True"
+
+<ldap>:
+  uri: "NULL"
+  user:
+    filter: "objectClass=*"
+    name:
+      attr: "uid"
+  group:
+    member:
+      attr: "memberOf"
+  superuser:
+    filter: "NULL"
+  data:
+    profiler:
+      filter: "NULL"
+  bind:
+    user: "cn=Manager,dc=example,dc=com"
+    password: "insecure"
+  basedn: "dc=example,dc=com"
+  cacert: "/etc/ca/ldap_ca.crt"
+  search:
+    scope: "LEVEL"
+  ignore:
+    malformed:
+      schema: "False"
+
+<mesos>:
+  master: "localhost:5050"
+  framework:
+    name: "Airflow"
+  task:
+    cpu: "1"
+    memory: "256"
+  checkpoint: "False"
+  authenticate: "False"
+
+<kerberos>:
+  ccache: "/tmp/airflow_krb5_ccache"
+  principal: "airflow"
+  reinit:
+    frequency: "3600"
+  kinit:
+    path: "kinit"
+  keytab: "airflow.keytab"
+
+<github_enterprise>:
+  api:
+    rev: "v3"
+
+<admin>:
+  hide:
+    sensitive:
+      variable:
+        fields: "True"
+
+<elasticsearch>:
+  host: "NULL"
+  log:
+    id:
+      template: "{dag_id}-{task_id}-{execution_date}-{try_number}"
+  end:
+    of:
+      log:
+        mark: "end_of_log"
+  frontend: "NULL"
+  write:
+    stdout: "False"
+  json:
+    format: "False"
+    fields: "asctime, filename, lineno, levelname, message"
+
+<elasticsearch_configs>:
+  use:
+    ssl: "False"
+  verify:
+    certs: "True"
+
+<kubernetes>:
+  worker:
+    container:
+      repository: "NULL"
+      tag: "NULL"
+      image:
+        pull:
+          policy: "IfNotPresent"
+    pods:
+      creation:
+        batch:
+          size: "1"
+    service:
+      account:
+        name: "NULL"
+  delete:
+    worker:
+      pods: "True"
+  namespace: "default"
+  airflow:
+    configmap: "NULL"
+  dags:
+    in:
+      image: "False"
+    volume:
+      subpath: "NULL"
+      claim: "NULL"
+      host: "NULL"
+  logs:
+    volume:
+      subpath: "NULL"
+      claim: "NULL"
+      host: "NULL"
+  env:
+    from:
+      configmap:
+        ref: "NULL"
+      secret:
+        ref: "NULL"
+  git:
+    repo: "NULL"
+    branch: "NULL"
+    subpath: "NULL"
+    user: "NULL"
+    password: "NULL"
+    sync:
+      root: "/git"
+      dest: "repo"
+      credentials:
+        secret: "NULL"
+      container:
+        repository: "k8s.gcr.io/git-sync"
+        tag: "v3.1.1"
+      init:
+        container:
+          name: "git-sync-clone"
+      run:
+        as:
+          user: "65535"
+    dags:
+      folder:
+        mount:
+          point: "NULL"
+    ssh:
+      key:
+        secret:
+          name: "NULL"
+      known:
+        hosts:
+          configmap:
+            name: "NULL"
+  image:
+    pull:
+      secrets: "NULL"
+  gcp:
+    service:
+      account:
+        keys: "NULL"
+  in:
+    cluster: "True"
+  affinity: "NULL"
+  tolerations: "NULL"
+  kube:
+    client:
+      request:
+        args: "{\\\"_request_timeout\\\" : [60,60] }"
+  run:
+    as:
+      user: "NULL"
+  fs:
+    group: "NULL"

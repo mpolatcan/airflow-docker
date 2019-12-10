@@ -1,0 +1,46 @@
+version: "3.6"
+services:
+  airflow-master:
+    image: mpolatcan/airflow
+    container_name: airflow-master
+    environment:
+      CORE_EXECUTOR: CeleryExecutor
+      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      AIRFLOW_DAEMONS: |
+        scheduler
+        webserver
+        flower
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+      - redis
+
+  airflow-worker:
+    image: mpolatcan/airflow
+    container: airflow-worker
+    environment:
+      CORE_EXECUTOR: CeleryExecutor
+      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      AIRFLOW_DAEMONS: |
+        worker
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+
+  redis:
+    image: redis
+    container_name: redis
+    hostname: redis
