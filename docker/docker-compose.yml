@@ -7,30 +7,32 @@ services:
       CORE_EXECUTOR: CeleryExecutor
       CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
       CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: postgresql://airflow:airflow@postgres:5432/airflow
       AIRFLOW_DAEMONS: |
         scheduler
         webserver
         flower
     ports:
       - 8080:8080
+      - 5555:5555
     depends_on:
       - postgres
       - redis
+    user: airflow
 
   airflow-worker:
     image: mpolatcan/airflow:1.10.6-python3.6
-    container_name: airflow-worker
     environment:
       CORE_EXECUTOR: CeleryExecutor
       CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
       CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: postgresql://airflow:airflow@postgres:5432/airflow
       AIRFLOW_DAEMONS: |
         worker
     depends_on:
       - postgres
       - redis
+      - airflow-master
 
   postgres:
     image: postgres

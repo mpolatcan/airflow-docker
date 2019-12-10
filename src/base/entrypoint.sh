@@ -10,7 +10,7 @@ if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
       airflow initdb
     fi
 
-    airflow $daemon &
+    airflow $daemon -D
   done
 
   tail -f /dev/null
