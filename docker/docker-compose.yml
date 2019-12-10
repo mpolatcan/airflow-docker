@@ -1,7 +1,7 @@
 version: "3.6"
 services:
   airflow-master:
-    image: mpolatcan/airflow
+    image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-master
     environment:
       CORE_EXECUTOR: CeleryExecutor
@@ -19,8 +19,8 @@ services:
       - redis
 
   airflow-worker:
-    image: mpolatcan/airflow
-    container: airflow-worker
+    image: mpolatcan/airflow:1.10.6-python3.6
+    container_name: airflow-worker
     environment:
       CORE_EXECUTOR: CeleryExecutor
       CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow

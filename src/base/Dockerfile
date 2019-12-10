@@ -234,4 +234,5 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends nano gcc g++ default-libmysqlclient-dev libkrb5-dev libsasl2-dev && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install "pymssql<3.0" && \
-    chmod +x config_loader.sh entrypoint.sh
+    chmod +x config_loader.sh entrypoint.sh && \
+    mkdir -p ${AIRFLOW_HOME}
