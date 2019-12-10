@@ -7,7 +7,7 @@ services:
       CORE_EXECUTOR: CeleryExecutor
       CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
       CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: postgresql://airflow:airflow@postgres:5432/airflow
+      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
       AIRFLOW_DAEMONS: |
         scheduler
         webserver
@@ -26,7 +26,7 @@ services:
       CORE_EXECUTOR: CeleryExecutor
       CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
       CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: postgresql://airflow:airflow@postgres:5432/airflow
+      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
       AIRFLOW_DAEMONS: |
         worker
     depends_on:
