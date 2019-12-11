@@ -1,6 +1,8 @@
+# Written by Mutlu Polatcan
+# 12.11.2019
 version: "3.6"
 services:
-  airflow-master:
+  airflow-scheduler:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-master
     environment:
@@ -10,14 +12,11 @@ services:
       CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
       AIRFLOW_DAEMONS: |
         scheduler
-        webserver
-        flower
-    ports:
-      - 8080:8080
-      - 5555:5555
     depends_on:
       - postgres
       - redis
+    volumes:
+      - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
     image: mpolatcan/airflow:1.10.6-python3.6
@@ -31,7 +30,42 @@ services:
     depends_on:
       - postgres
       - redis
-      - airflow-master
+      - airflow-scheduler
+    volumes:
+      - ./dags:/home/airflow/airflow/dags
+
+  airflow-webserver:
+    image: mpolatcan/airflow:1.10.6-python3.6
+    container_name: airflow-webserver
+    environment:
+      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
+      AIRFLOW_DAEMONS: |
+        webserver
+    depends_on:
+      - airflow-scheduler
+      - postgres
+      - redis
+    ports:
+      - 8080:8080
+    volumes:
+      - ./dags:/home/airflow/airflow/dags
+
+  celery-flower:
+    image: mpolatcan/airflow:1.10.6-python3.6
+    container_name: celery-flower
+    environment:
+      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
+      AIRFLOW_DAEMONS: |
+        flower
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - 5555:5555
+    volumes:
+      - ./dags:/home/airflow/airflow/dags
 
   postgres:
     image: postgres
