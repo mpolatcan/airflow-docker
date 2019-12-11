@@ -1,13 +1,13 @@
 <core>:
   dags:
-    folder: "NULL"
+    folder: "=${AIRFLOW_HOME}/dags"
     are:
       paused:
         at:
           creation: "True"
   base:
     log:
-      folder: "NULL"
+      folder: "=${AIRFLOW_HOME}/logs"
   remote:
     logging: "False"
     log:
@@ -88,9 +88,9 @@
         per:
           dag: "16"
   load:
-    examples: "True"
+    examples: "False"
   plugins:
-    folder: "=${AIRFLOW_HOME}/airflow/plugins"
+    folder: "=${AIRFLOW_HOME}/plugins"
   fernet:
     key: "=$(python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\")"
   donot:
@@ -183,6 +183,8 @@
   expose:
     config: "False"
   authenticate: "False"
+  auth:
+    backend: "NULL"
   filter:
     by:
       owner: "False"
