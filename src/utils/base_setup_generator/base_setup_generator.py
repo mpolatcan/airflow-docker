@@ -65,7 +65,7 @@ class BaseSetupGenerator:
                     tokens = value.split(",")
 
                     load_fn_calls.append(Constants.CONFIG_LOADER_OPT_SUBST_STATEMENT_FMT.format(
-                        property=property_name, check=tokens[0][1:], substitution_not_null=tokens[1], substitution_null=tokens[2], config_filename=config_filename
+                        property=property_name, check=tokens[0][1:].strip(), substitution_not_null=tokens[1].strip(), substitution_null=tokens[2].strip(), config_filename=config_filename
                     ))
                 else:
                     docker_env_vars.append(Constants.DOCKER_ENV_VAR_FMT.format(env_var_name=env_var_name, env_var_value=value))

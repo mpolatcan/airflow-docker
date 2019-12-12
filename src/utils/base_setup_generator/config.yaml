@@ -10,6 +10,21 @@ base_dockerfile_template: |
       AIRFLOW_CONF_DIR="${{AIRFLOW_USER_HOME}}/airflow" \
       AIRFLOW_VIRTUALENV="${{AIRFLOW_USER_HOME}}/airflow_venv" \
       AIRFLOW_DAEMONS="NULL" \
+      AIRFLOW_DATABASE_TYPE="postgresql" \
+      AIRFLOW_DATABASE_HOST="NULL" \
+      AIRFLOW_DATABASE_PORT="NULL" \
+      AIRFLOW_DATABASE_USERNAME="NULL" \
+      AIRFLOW_DATABASE_PASSWORD="NULL" \
+      AIRFLOW_BROKER_TYPE="redis" \
+      AIRFLOW_BROKER_HOST="NULL" \
+      AIRFLOW_BROKER_PORT="NULL" \
+      AIRFLOW_BROKER_USERNAME="NULL" \
+      AIRFLOW_BROKER_PASSWORD="NULL" \
+      POSTGRESQL_PORT="5432" \
+      MYSQL_PORT="3306" \
+      REDIS_PORT="6379" \
+      RABBITMQ_PORT="5672" \
+      HEALTHCHECK_INTERVAL_IN_SECS="2" \
   {env_vars}
   ENV PATH=${{AIRFLOW_VIRTUALENV}}/bin:$PATH
 
@@ -20,6 +35,7 @@ base_dockerfile_template: |
       apt-get -y install --no-install-recommends nano \
                                                  gcc \
                                                  g++ \
+                                                 netcat \
                                                  default-libmysqlclient-dev \
                                                  libkrb5-dev \
                                                  libsasl2-dev && \

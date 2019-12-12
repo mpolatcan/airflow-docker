@@ -69,7 +69,10 @@
   executor: "SequentialExecutor"
   sql:
     alchemy:
-      conn: "sqlite:////root/airflow/airflow.db"
+      conn: >-
+        ?${AIRFLOW_DATABASE_PASSWORD},
+        ${AIRFLOW_DATABASE_TYPE}://${AIRFLOW_DATABASE_USERNAME}:${AIRFLOW_DATABASE_PASSWORD}@${AIRFLOW_DATABASE_HOST}:${AIRFLOW_DATABASE_PORT}/airflow,
+        ${AIRFLOW_DATABASE_TYPE}://${AIRFLOW_DATABASE_HOST}:${AIRFLOW_DATABASE_PORT}/airflow
       pool:
         enabled: "True"
         size: "5"

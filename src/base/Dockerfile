@@ -9,6 +9,21 @@ ENV AIRFLOW_HOME="${AIRFLOW_USER_HOME}/airflow" \
     AIRFLOW_CONF_DIR="${AIRFLOW_USER_HOME}/airflow" \
     AIRFLOW_VIRTUALENV="${AIRFLOW_USER_HOME}/airflow_venv" \
     AIRFLOW_DAEMONS="NULL" \
+    AIRFLOW_DATABASE_TYPE="postgresql" \
+    AIRFLOW_DATABASE_HOST="NULL" \
+    AIRFLOW_DATABASE_PORT="NULL" \
+    AIRFLOW_DATABASE_USERNAME="NULL" \
+    AIRFLOW_DATABASE_PASSWORD="NULL" \
+    AIRFLOW_BROKER_TYPE="redis" \
+    AIRFLOW_BROKER_HOST="NULL" \
+    AIRFLOW_BROKER_PORT="NULL" \
+    AIRFLOW_BROKER_USERNAME="NULL" \
+    AIRFLOW_BROKER_PASSWORD="NULL" \
+    POSTGRESQL_PORT="5432" \
+    MYSQL_PORT="3306" \
+    REDIS_PORT="6379" \
+    RABBITMQ_PORT="5672" \
+    HEALTHCHECK_INTERVAL_IN_SECS="2" \
 	CORE_DAGS_ARE_PAUSED_AT_CREATION="True" \
 	CORE_REMOTE_LOGGING="False" \
 	CORE_REMOTE_LOG_CONN_ID="NULL" \
@@ -33,7 +48,6 @@ ENV AIRFLOW_HOME="${AIRFLOW_USER_HOME}/airflow" \
 	CORE_DEFAULT_IMPERSONATION="NULL" \
 	CORE_DEFAULT_TASK_RETRIES="0" \
 	CORE_EXECUTOR="SequentialExecutor" \
-	CORE_SQL_ALCHEMY_CONN="sqlite:////root/airflow/airflow.db" \
 	CORE_SQL_ALCHEMY_POOL_ENABLED="True" \
 	CORE_SQL_ALCHEMY_POOL_SIZE="5" \
 	CORE_SQL_ALCHEMY_POOL_RECYCLE="1800" \
@@ -234,6 +248,7 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends nano \
                                                gcc \
                                                g++ \
+                                               netcat \
                                                default-libmysqlclient-dev \
                                                libkrb5-dev \
                                                libsasl2-dev && \

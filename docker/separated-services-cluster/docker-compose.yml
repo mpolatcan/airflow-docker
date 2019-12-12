@@ -1,36 +1,30 @@
 # Written by Mutlu Polatcan
 # 12.11.2019
+# ------------------------------
 version: "3.6"
 services:
   airflow-scheduler:
     image: mpolatcan/airflow:1.10.6-python3.6
-    container_name: airflow-master
+    container_name: airflow-scheduler
     environment:
-      CORE_EXECUTOR: CeleryExecutor
-      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
+      CORE_EXECUTOR: "CeleryExecutor"
+      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@postgres:5432/airflow"
       AIRFLOW_DAEMONS: |
         scheduler
-    depends_on:
-      - postgres
-      - redis
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
     image: mpolatcan/airflow:1.10.6-python3.6
     environment:
-      CORE_EXECUTOR: CeleryExecutor
-      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
+      CORE_EXECUTOR: "CeleryExecutor"
+      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@postgres:5432/airflow"
       AIRFLOW_DAEMONS: |
         worker
-    depends_on:
-      - postgres
-      - redis
-      - airflow-scheduler
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
@@ -38,13 +32,11 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-webserver
     environment:
-      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
+      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
+      WEBSERVER_AUTHENTICATE: "True"
+      WEBSERVER_AUTH_BACKEND: "airflow.contrib.auth.backends.password_auth"
       AIRFLOW_DAEMONS: |
         webserver
-    depends_on:
-      - airflow-scheduler
-      - postgres
-      - redis
     ports:
       - 8080:8080
     volumes:
@@ -54,14 +46,11 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: celery-flower
     environment:
-      CORE_SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5432/airflow
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: db+postgresql://airflow:airflow@postgres:5432/airflow
+      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@postgres:5432/airflow"
       AIRFLOW_DAEMONS: |
         flower
-    depends_on:
-      - postgres
-      - redis
     ports:
       - 5555:5555
     volumes:
