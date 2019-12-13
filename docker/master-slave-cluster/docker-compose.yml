@@ -8,9 +8,16 @@ services:
     container_name: airflow-master
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
-      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
-      CELERY_BROKER_URL: "redis://redis:6379/0"
-      CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@postgres:5432/airflow"
+      AIRFLOW_DATABASE_TYPE: "postgresql"
+      AIRFLOW_DATABASE_HOST: "postgres"
+      AIRFLOW_DATABASE_USER: "airflow"
+      AIRFLOW_DATABASE_PASSWORD: "airflow"
+      AIRFLOW_BROKER_TYPE: "redis"
+      AIRFLOW_BROKER_HOST: "redis"
+      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
+      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
+      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
+      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         scheduler
         webserver
@@ -28,9 +35,16 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
-      CORE_SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres:5432/airflow"
-      CELERY_BROKER_URL: "redis://redis:6379/0"
-      CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@postgres:5432/airflow"
+      AIRFLOW_DATABASE_TYPE: "postgresql"
+      AIRFLOW_DATABASE_HOST: "postgres"
+      AIRFLOW_DATABASE_USER: "airflow"
+      AIRFLOW_DATABASE_PASSWORD: "airflow"
+      AIRFLOW_BROKER_TYPE: "redis"
+      AIRFLOW_BROKER_HOST: "redis"
+      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
+      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
+      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
+      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         worker
     depends_on:

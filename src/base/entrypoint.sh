@@ -44,11 +44,11 @@ function __host_checker__() {
 }
 
 function check_hosts_defined() {
-    __host_checker__ ${AIRFLOW_COMPONENT_DATABASE} ${AIRFLOW_DATABASE_HOST}
+    __host_checker__ "${AIRFLOW_COMPONENT_DATABASE}" "${AIRFLOW_DATABASE_HOST}"
 
     if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_CELERY}" ]]; then
-        __host_checker__ ${AIRFLOW_COMPONENT_BROKER} ${AIRFLOW_BROKER_HOST}
-        __host_checker__ ${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND} ${AIRFLOW_BROKER_RESULT_BACKEND_HOST}
+        __host_checker__ "${AIRFLOW_COMPONENT_BROKER}" "${AIRFLOW_BROKER_HOST}"
+        __host_checker__ "${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND}" "${AIRFLOW_BROKER_RESULT_BACKEND_HOST}"
     fi
 }
 
