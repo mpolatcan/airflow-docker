@@ -2,7 +2,7 @@
 
 AIRFLOW_COMPONENT_DATABASE="database"
 AIRFLOW_COMPONENT_BROKER="broker"
-AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker result backend"
+AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker\ result\ backend"
 AIRFLOW_DAEMON_SCHEDULER="scheduler"
 AIRFLOW_EXECUTOR_CELERY="CeleryExecutor"
 
@@ -24,7 +24,7 @@ function health_checker() {
 
   until [[ $result -eq 0 ]]; do
     echo "Waiting $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
-    sleep ${HEALTHCHECK_INTERVAL_IN_SECS}
+    sleep ${AIRFLOW_HEALTHCHECK_INTERVAL_IN_SECS}
     nc -z $3 $4
     result=$?
   done
@@ -54,14 +54,17 @@ function check_hosts_defined() {
 
 function apply_default_ports_ifnotdef() {
   if [[ "${AIRFLOW_DATABASE_PORT}" == "NULL" ]]; then
+      echo "Airflow database port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
       export AIRFLOW_DATABASE_PORT=${SERVICE_PORTS[${AIRFLOW_DATABASE_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_PORT}" == "NULL" ]]; then
+      echo "Airflow broker port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
       export AIRFLOW_BROKER_PORT=${SERVICE_PORTS[${AIRFLOW_BROKER_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_RESULT_BACKEND_PORT}" == "NULL" ]]; then
+      echo "Airflow broker result backend port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
       export AIRFLOW_BROKER_RESULT_BACKEND_PORT=${SERVICE_PORTS[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}
   fi
 }
