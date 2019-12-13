@@ -77,9 +77,9 @@ function start_daemons() {
         airflow initdb
     fi
 
-    echo "Starting \"$daemon\"..."
+    echo "Starting \"$DAEMON\"..."
 
-    airflow $daemon &
+    airflow $DAEMON &
   done
 }
 
