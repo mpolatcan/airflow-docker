@@ -14,6 +14,17 @@ SERVICE_PORTS[redis]="6379"
 SERVICE_PORTS[rabbitmq]="5672"
 
 # $1: Service name
+# $2: Service host
+function __host_checker__() {
+  if [[ "$2" == "NULL" ]]; then
+    echo "Airflow $1 host is not defined. Exiting ✘..."
+    exit 1
+  else
+    echo "Airflow $1 host is $2. OK ✔"
+  fi
+}
+
+# $1: Service name
 # $2: Service type
 # $3: Service hostname
 # $4: Service port
@@ -30,17 +41,6 @@ function health_checker() {
   done
 
   echo "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
-}
-
-# $1: Service name
-# $2: Service host
-function __host_checker__() {
-  if [[ "$2" == "NULL" ]]; then
-    echo "Airflow $1 host is not defined. Exiting ✘..."
-    exit 1
-  else
-    echo "Airflow $1 host is $2. OK ✔"
-  fi
 }
 
 function check_hosts_defined() {
@@ -71,15 +71,24 @@ function apply_default_ports_ifnotdef() {
 
 function start_daemons() {
   for DAEMON in ${AIRFLOW_DAEMONS[@]}; do
+    # Scheduler initializes Airflow database
     if [[ "$DAEMON" == "${AIRFLOW_DAEMON_SCHEDULER}" ]]; then
         echo "Initializing Airflow database..."
 
         airflow initdb
     fi
 
-    echo "Starting \"$DAEMON\"..."
+    echo "Starting Airflow daemon \"$DAEMON\"..."
+    airflow $DAEMON &>"airflow_$DAEMON.log"
+    exit_code=$?
 
-    airflow $DAEMON &
+    until [[ $exit_code -eq 1 ]]; do
+      echo "Airflow daemon \"$DAEMON\" start has some failures. Retrying again..."
+      sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
+      echo "Starting Airflow daemon \"$DAEMON\"..."
+      airflow $DAEMON &>"airflow_$DAEMON.log"
+      exit_code=$?
+    done
   done
 }
 

@@ -25,9 +25,6 @@ services:
     ports:
       - 8080:8080
       - 5555:5555
-    depends_on:
-      - postgres
-      - redis
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
@@ -47,10 +44,6 @@ services:
       AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         worker
-    depends_on:
-      - postgres
-      - redis
-      - airflow-master
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
@@ -59,8 +52,8 @@ services:
     container_name: postgres
     hostname: postgres
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
+      POSTGRES_USER: "airflow"
+      POSTGRES_PASSWORD: "airflow"
 
   redis:
     image: redis
