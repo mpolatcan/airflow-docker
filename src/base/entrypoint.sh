@@ -81,6 +81,7 @@ function start_daemons() {
     echo "Starting Airflow daemon \"$DAEMON\"..."
     airflow $DAEMON -D &> "airflow_$DAEMON.log"
     exec_result=$?
+    echo "Result exec code: $exec_result"
 
     counter=0
 
