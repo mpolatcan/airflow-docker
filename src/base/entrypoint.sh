@@ -79,15 +79,25 @@ function start_daemons() {
     fi
 
     echo "Starting Airflow daemon \"$DAEMON\"..."
-    airflow $DAEMON &>"airflow_$DAEMON.log"
-    exit_code=$?
+    airflow $DAEMON -D &> "airflow_$DAEMON.log"
+    exec_result=$?
 
-    until [[ $exit_code -eq 1 ]]; do
-      echo "Airflow daemon \"$DAEMON\" start has some failures. Retrying again..."
+    counter=0
+
+    until [[ $exec_result -eq 1 ]]; do
+      echo "Airflow daemon \"$DAEMON\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
+
       sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-      echo "Starting Airflow daemon \"$DAEMON\"..."
-      airflow $DAEMON &>"airflow_$DAEMON.log"
-      exit_code=$?
+
+      (( counter = counter + 1 ))
+
+      if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
+          echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
+          exit 1
+      fi
+
+      airflow $DAEMON -D &> "airflow_$DAEMON.log"
+      exec_result=$?
     done
   done
 }
