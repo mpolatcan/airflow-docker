@@ -70,36 +70,35 @@ function apply_default_ports_ifnotdef() {
 }
 
 function start_daemons() {
-  for DAEMON in ${AIRFLOW_DAEMONS[@]}; do
-    # Scheduler initializes Airflow database
-    if [[ "$DAEMON" == "${AIRFLOW_DAEMON_SCHEDULER}" ]]; then
-        echo "Initializing Airflow database..."
+  for daemon in ${AIRFLOW_DAEMONS[@]}; do
+      # Scheduler initializes Airflow database
+      if [[ "$daemon" == "${AIRFLOW_DAEMON_SCHEDULER}" ]]; then
+          echo "Initializing Airflow database..."
 
-        airflow initdb
-    fi
-
-    echo "Starting Airflow daemon \"$DAEMON\"..."
-    airflow $DAEMON -D &> "airflow_$DAEMON.log"
-    exec_result=$?
-    echo "Result exec code: $exec_result"
-
-    counter=0
-
-    until [[ $exec_result -eq 1 ]]; do
-      echo "Airflow daemon \"$DAEMON\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
-
-      sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-
-      (( counter = counter + 1 ))
-
-      if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-          echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
-          exit 1
+          airflow initdb
       fi
 
-      airflow $DAEMON -D &> "airflow_$DAEMON.log"
+      echo "Starting Airflow daemon \"$daemon\"..."
+      airflow $daemon -D
       exec_result=$?
-    done
+
+      until [[ $exec_result -eq 0 ]]; do
+          echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
+
+          sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
+
+          (( counter = counter + 1 ))
+
+          if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
+            echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
+            exit 1
+          fi
+
+          airflow $daemon -D
+          exex_result=$?
+      done
+
+      echo "Airflow daemon \"$daemon\" started successfully!"
   done
 }
 

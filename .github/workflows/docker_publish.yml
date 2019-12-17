@@ -27,7 +27,7 @@ jobs:
       matrix:
         repository: [airflow]
         python_version: [3.6]
-        airflow_version: [1.10.6]
+        airflow_version: [1.10.5, 1.10.6]
     needs: build-base-image
     steps:
       - uses: actions/checkout@v1
