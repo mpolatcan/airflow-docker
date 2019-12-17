@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Written by Mutlu Polatcan
+# 17.12.2019
+# ---------------------------
 AIRFLOW_COMPONENT_DATABASE="database"
 AIRFLOW_COMPONENT_BROKER="broker"
 AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker_result_backend"
@@ -69,6 +72,31 @@ function apply_default_ports_ifnotdef() {
   fi
 }
 
+# $1: daemon
+function __start_daemon__() {
+    echo "Starting Airflow daemon \"$1\"..."
+    airflow $1 -D
+    exec_result=$?
+
+    until [[ $exec_result -eq 0 ]]; do
+        echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
+
+        sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
+
+        (( counter = counter + 1 ))
+
+        if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
+          echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
+          exit 1
+        fi
+
+        airflow $1 -D
+        exec_result=$?
+    done
+
+    echo "Airflow daemon \"$daemon\" started successfully!"
+}
+
 function start_daemons() {
   for daemon in ${AIRFLOW_DAEMONS[@]}; do
       # Scheduler initializes Airflow database
@@ -78,27 +106,7 @@ function start_daemons() {
           airflow initdb
       fi
 
-      echo "Starting Airflow daemon \"$daemon\"..."
-      airflow $daemon -D
-      exec_result=$?
-
-      until [[ $exec_result -eq 0 ]]; do
-          echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
-
-          sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-
-          (( counter = counter + 1 ))
-
-          if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-            echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
-            exit 1
-          fi
-
-          airflow $daemon -D
-          exex_result=$?
-      done
-
-      echo "Airflow daemon \"$daemon\" started successfully!"
+      __start_daemon__ $daemon &
   done
 }
 

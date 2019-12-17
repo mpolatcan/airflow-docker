@@ -4,7 +4,7 @@
 version: "3.6"
 services:
   airflow-scheduler:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.6-python3.6-test
     container_name: airflow-scheduler
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
@@ -24,7 +24,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.6-python3.6-test
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
       AIRFLOW_DATABASE_TYPE: "postgresql"
@@ -43,7 +43,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-webserver:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.6-python3.6-test
     container_name: airflow-webserver
     environment:
       AIRFLOW_DATABASE_TYPE: "postgresql"
@@ -58,7 +58,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   celery-flower:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.6-python3.6-test
     container_name: celery-flower
     environment:
       AIRFLOW_DATABASE_TYPE: "postgresql"
