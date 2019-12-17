@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: airflow-worker
+  labels:
+    app: airflow
+    unit: worker
+spec:
+  serviceName: airflow-worker
+  selector:
+    matchLabels:
+      app: airflow
+      unit: worker
+  template:
+    metadata:
+      name: airflow-worker
+      labels:
+        app: airflow
+        unit: worker
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: airflow-worker
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: airflow-worker

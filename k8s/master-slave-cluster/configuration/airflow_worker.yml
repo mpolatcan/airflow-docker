@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-worker
+  labels:
+    app: airflow
+    unit: worker
+data:
+  CORE_EXECUTOR: "CeleryExecutor"
+  AIRFLOW_DATABASE_TYPE: "postgresql"
+  AIRFLOW_DATABASE_HOST: "postgres-0.postgres"
+  AIRFLOW_DATABASE_USER: "airflow"
+  AIRFLOW_DATABASE_PASSWORD: "airflow"
+  AIRFLOW_BROKER_TYPE: "redis"
+  AIRFLOW_BROKER_HOST: "redis-0.redis"
+  AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
+  AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres-0.postgres"
+  AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
+  AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
+  AIRFLOW_DAEMONS: |
+    worker

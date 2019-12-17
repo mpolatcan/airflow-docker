@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: airflow-master
+  labels:
+    app: airflow
+    unit: master
+spec:
+  serviceName: airflow-master
+  selector:
+    matchLabels:
+      app: airflow
+      unit: master
+  template:
+    metadata:
+      name: airflow-master
+      labels:
+        app: airflow
+        unit: master
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: airflow-master
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: airflow-master
+          ports:
+            - containerPort: 8080

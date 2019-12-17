@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  labels:
+    app: airflow
+    unit: database
+spec:
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: airflow
+      unit: database
+  replicas: 1
+  template:
+    metadata:
+      name: postgres
+      labels:
+        app: airflow
+        unit: database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: postgres
+      restartPolicy: Always

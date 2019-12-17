@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    app: airflow
+    unit: broker
+spec:
+  serviceName: redis
+  selector:
+    matchLabels:
+      app: airflow
+      unit: broker
+  template:
+    metadata:
+      name: redis
+      labels:
+        app: airflow
+        unit: broker
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          imagePullPolicy: Always
+      restartPolicy: Always

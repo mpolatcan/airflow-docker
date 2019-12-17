@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-worker
+  labels:
+    app: airflow
+    unit: worker
+spec:
+  selector:
+    app: airflow
+    unit: worker
+  ports:
+    - port: 8080
+      targetPort: 8080
+  clusterIP: None
