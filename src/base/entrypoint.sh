@@ -107,12 +107,12 @@ function password_auth_create_initial_users() {
 
         echo "Creating user \"${user_infos[0]}\" on Airflow database..."
 
-        airflow create_user --username $user_infos[0] \
-                            --password $user_infos[1] \
-                            --email $user_infos[2] \
-                            --firstname $user_infos[3] \
-                            --lastname $user_infos[4] \
-                            --role $user_infos[5]
+        airflow create_user --username ${user_infos[0]} \
+                            --password ${user_infos[1]} \
+                            --email ${user_infos[2]} \
+                            --firstname ${user_infos[3]} \
+                            --lastname ${user_infos[4]} \
+                            --role ${user_infos[5]}
     done
 
 }
