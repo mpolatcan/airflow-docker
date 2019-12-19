@@ -26,8 +26,10 @@ base_dockerfile_template: |
       AIRFLOW_BROKER_RESULT_BACKEND_USER="NULL" \
       AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD="NULL" \
       AIRFLOW_HEALTHCHECK_INTERVAL_IN_SECS="2" \
+      AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE="NULL" \
       AIRFLOW_RETRY_INTERVAL_IN_SECS="1" \
       AIRFLOW_MAX_RETRY_TIMES="-1" \
+      AIRFLOW_INITIAL_USERS="NULL" \
   {env_vars}
   ENV PATH=${{AIRFLOW_VIRTUALENV}}/bin:$PATH
 
@@ -53,6 +55,13 @@ base_dockerfile_template: |
 
 config_loader_sh_template: |
   #!/usr/bin/env bash
+
+  declare -A __AUTHENTICATION_BACKENDS__
+
+  __AUTHENTICATION_BACKENDS__[password]="airflow.contrib.auth.backends.password_auth"
+  __AUTHENTICATION_BACKENDS__[ldap]="airflow.contrib.auth.backends.ldap_auth"
+  __AUTHENTICATION_BACKENDS__[github_enterprise]="airflow.contrib.auth.backends.github_enterprise_auth"
+  __AUTHENTICATION_BACKENDS__[google]="airflow.contrib.auth.backends.google_auth"
 
   function load_config() {{
       if [[ "$2" != "NULL" ]]

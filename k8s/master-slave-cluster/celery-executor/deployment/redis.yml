@@ -1,12 +1,15 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: redis
   labels:
     app: airflow
     unit: broker
 spec:
-  serviceName: redis
+  replicas: 1
   selector:
     matchLabels:
       app: airflow
@@ -18,8 +21,11 @@ spec:
         app: airflow
         unit: broker
     spec:
+      hostname: redis
       containers:
         - name: redis
           image: redis
           imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
       restartPolicy: Always

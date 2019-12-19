@@ -1,17 +1,19 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: postgres
   labels:
     app: airflow
     unit: database
 spec:
-  serviceName: postgres
+  replicas: 1
   selector:
     matchLabels:
       app: airflow
       unit: database
-  replicas: 1
   template:
     metadata:
       name: postgres
@@ -19,6 +21,7 @@ spec:
         app: airflow
         unit: database
     spec:
+      hostname: postgres
       containers:
         - name: postgres
           image: postgres
@@ -26,4 +29,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: postgres
+          ports:
+            - containerPort: 5432
       restartPolicy: Always

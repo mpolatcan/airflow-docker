@@ -3,29 +3,22 @@
 # Written by Mutlu Polatcan
 # 17.12.2019
 # ---------------------------
+declare -A __SERVICE_PORTS__
+
+__SERVICE_PORTS__[postgresql]="5432"
+__SERVICE_PORTS__[mysql]="3306"
+__SERVICE_PORTS__[redis]="6379"
+__SERVICE_PORTS__[rabbitmq]="5672"
+
 AIRFLOW_COMPONENT_DATABASE="database"
 AIRFLOW_COMPONENT_BROKER="broker"
 AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker_result_backend"
 AIRFLOW_DAEMON_SCHEDULER="scheduler"
 AIRFLOW_EXECUTOR_CELERY="CeleryExecutor"
-
-declare -A SERVICE_PORTS
-
-SERVICE_PORTS[postgresql]="5432"
-SERVICE_PORTS[mysql]="3306"
-SERVICE_PORTS[redis]="6379"
-SERVICE_PORTS[rabbitmq]="5672"
-
-# $1: Service name
-# $2: Service host
-function __host_checker__() {
-  if [[ "$2" == "NULL" ]]; then
-    echo "Airflow $1 host is not defined. Exiting ✘..."
-    exit 1
-  else
-    echo "Airflow $1 host is $2. OK ✔"
-  fi
-}
+AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD="password"
+AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_LDAP="ldap"
+AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GOOGLE="google"
+AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GITHUB_ENTERPRISE="github_enterprise"
 
 # $1: Service name
 # $2: Service type
@@ -46,6 +39,17 @@ function health_checker() {
   echo "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
 }
 
+# $1: Service name
+# $2: Service host
+function __host_checker__() {
+  if [[ "$2" == "NULL" ]]; then
+    echo "Airflow $1 host is not defined. Exiting ✘..."
+    exit 1
+  else
+    echo "Airflow $1 host is $2. OK ✔"
+  fi
+}
+
 function check_hosts_defined() {
     __host_checker__ "${AIRFLOW_COMPONENT_DATABASE}" "${AIRFLOW_DATABASE_HOST}"
 
@@ -57,18 +61,18 @@ function check_hosts_defined() {
 
 function apply_default_ports_ifnotdef() {
   if [[ "${AIRFLOW_DATABASE_PORT}" == "NULL" ]]; then
-      echo "Airflow database port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
-      export AIRFLOW_DATABASE_PORT=${SERVICE_PORTS[${AIRFLOW_DATABASE_TYPE}]}
+      echo "Airflow database port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
+      export AIRFLOW_DATABASE_PORT=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_PORT}" == "NULL" ]]; then
-      echo "Airflow broker port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
-      export AIRFLOW_BROKER_PORT=${SERVICE_PORTS[${AIRFLOW_BROKER_TYPE}]}
+      echo "Airflow broker port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
+      export AIRFLOW_BROKER_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_RESULT_BACKEND_PORT}" == "NULL" ]]; then
-      echo "Airflow broker result backend port is not defined. Default port \"${SERVICE_PORTS[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
-      export AIRFLOW_BROKER_RESULT_BACKEND_PORT=${SERVICE_PORTS[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}
+      echo "Airflow broker result backend port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
+      export AIRFLOW_BROKER_RESULT_BACKEND_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}
   fi
 }
 
@@ -110,6 +114,21 @@ function start_daemons() {
   done
 }
 
+function password_auth_create_initial_users() {
+    for row in ${AIRFLOW_INITIAL_USERS[@]}; do
+        IFS="|" read -r -a user_infos <<< $row
+
+        echo "Creating user \"${user_infos[1]}\" on Airflow database..."ü
+
+        airflow create_user --username $user_infos[1] \
+                            --password $user_infos[2] \
+                            --firstname $user_infos[3] \
+                            --lastname $user_infos[4] \
+                            --role $user_infos[5]
+    done
+
+}
+
 if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
   # If required components hostname not defined raise error
   check_hosts_defined
@@ -133,6 +152,14 @@ if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
 
   # Start daemons
   start_daemons
+
+  # If Webserver authentication enabled and authentication type
+  # is username-password style, create initial users if defined
+  if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
+        "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
+        "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
+      password_auth_create_initial_users
+  fi
 
   tail -f /dev/null
 fi

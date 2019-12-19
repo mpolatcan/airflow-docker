@@ -187,7 +187,7 @@
     config: "False"
   authenticate: "False"
   auth:
-    backend: "NULL"
+    backend: "=${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}]}"
   filter:
     by:
       owner: "False"
@@ -394,6 +394,24 @@
 <github_enterprise>:
   api:
     rev: "v3"
+  host: "NULL"
+  client:
+    id: "NULL"
+    secret: "NULL"
+  oauth:
+    callback:
+      route: "NULL"
+  allowed:
+    teams: "NULL"
+
+<google>:
+  client:
+    id: "NULL"
+    secret: "NULL"
+  oauth:
+    callback:
+      route: "NULL"
+  domain: "NULL"
 
 <admin>:
   hide:

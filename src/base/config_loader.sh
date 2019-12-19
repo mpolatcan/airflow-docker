@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+declare -A __AUTHENTICATION_BACKENDS__
+
+__AUTHENTICATION_BACKENDS__[password]="airflow.contrib.auth.backends.password_auth"
+__AUTHENTICATION_BACKENDS__[ldap]="airflow.contrib.auth.backends.ldap_auth"
+__AUTHENTICATION_BACKENDS__[github_enterprise]="airflow.contrib.auth.backends.github_enterprise_auth"
+__AUTHENTICATION_BACKENDS__[google]="airflow.contrib.auth.backends.google_auth"
+
 function load_config() {
     if [[ "$2" != "NULL" ]]
         then
@@ -113,7 +120,7 @@ load_config "access_logfile" "${WEBSERVER_ACCESS_LOGFILE}" "airflow.cfg"
 load_config "error_logfile" "${WEBSERVER_ERROR_LOGFILE}" "airflow.cfg"
 load_config "expose_config" "${WEBSERVER_EXPOSE_CONFIG}" "airflow.cfg"
 load_config "authenticate" "${WEBSERVER_AUTHENTICATE}" "airflow.cfg"
-load_config "auth_backend" "${WEBSERVER_AUTH_BACKEND}" "airflow.cfg"
+load_config "auth_backend" "${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}]}" "airflow.cfg"
 load_config "filter_by_owner" "${WEBSERVER_FILTER_BY_OWNER}" "airflow.cfg"
 load_config "owner_mode" "${WEBSERVER_OWNER_MODE}" "airflow.cfg"
 load_config "dag_default_view" "${WEBSERVER_DAG_DEFAULT_VIEW}" "airflow.cfg"
@@ -224,6 +231,17 @@ load_config "keytab" "${KERBEROS_KEYTAB}" "airflow.cfg"
 
 printf "\n[github_enterprise]\n" >> "${AIRFLOW_CONF_DIR}/airflow.cfg"
 load_config "api_rev" "${GITHUB_ENTERPRISE_API_REV}" "airflow.cfg"
+load_config "host" "${GITHUB_ENTERPRISE_HOST}" "airflow.cfg"
+load_config "client_id" "${GITHUB_ENTERPRISE_CLIENT_ID}" "airflow.cfg"
+load_config "client_secret" "${GITHUB_ENTERPRISE_CLIENT_SECRET}" "airflow.cfg"
+load_config "oauth_callback_route" "${GITHUB_ENTERPRISE_OAUTH_CALLBACK_ROUTE}" "airflow.cfg"
+load_config "allowed_teams" "${GITHUB_ENTERPRISE_ALLOWED_TEAMS}" "airflow.cfg"
+
+printf "\n[google]\n" >> "${AIRFLOW_CONF_DIR}/airflow.cfg"
+load_config "client_id" "${GOOGLE_CLIENT_ID}" "airflow.cfg"
+load_config "client_secret" "${GOOGLE_CLIENT_SECRET}" "airflow.cfg"
+load_config "oauth_callback_route" "${GOOGLE_OAUTH_CALLBACK_ROUTE}" "airflow.cfg"
+load_config "domain" "${GOOGLE_DOMAIN}" "airflow.cfg"
 
 printf "\n[admin]\n" >> "${AIRFLOW_CONF_DIR}/airflow.cfg"
 load_config "hide_sensitive_variable_fields" "${ADMIN_HIDE_SENSITIVE_VARIABLE_FIELDS}" "airflow.cfg"

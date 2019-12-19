@@ -1,15 +1,18 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
 apiVersion: v1
 kind: Service
 metadata:
-  name: airflow-worker
+  name: airflow-master
   labels:
     app: airflow
-    unit: worker
+    unit: master
 spec:
   selector:
     app: airflow
-    unit: worker
+    unit: master
   ports:
     - port: 8080
       targetPort: 8080
-  clusterIP: None
+  type: NodePort

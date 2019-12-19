@@ -1,12 +1,14 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: airflow-master
   labels:
     app: airflow
     unit: master
 spec:
-  serviceName: airflow-master
   selector:
     matchLabels:
       app: airflow
@@ -23,8 +25,15 @@ spec:
         - name: airflow-master
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
+          env:
+            - name: AIRFLOW_DAEMONS
+              value: |
+                scheduler
+                webserver
+                flower
           envFrom:
             - configMapRef:
-                name: airflow-master
+                name: airflow
           ports:
-            - containerPort: 8080
+            - containerPort: 8080 # Airflow UI Port
+            - containerPort: 5555 # Celery Flower UI port

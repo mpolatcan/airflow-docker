@@ -1,12 +1,14 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: airflow-worker
   labels:
     app: airflow
     unit: worker
 spec:
-  serviceName: airflow-worker
   selector:
     matchLabels:
       app: airflow
@@ -23,6 +25,10 @@ spec:
         - name: airflow-worker
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
+          env:
+            - name: AIRFLOW_DAEMONS
+              value: |
+                worker
           envFrom:
             - configMapRef:
-                name: airflow-worker
+                name: airflow
