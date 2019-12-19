@@ -108,6 +108,14 @@ function start_daemons() {
           echo "Initializing Airflow database..."
 
           airflow initdb
+
+          # If Webserver authentication enabled and authentication type
+          # is username-password style, create initial users if defined
+          if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
+                "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
+                "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
+              password_auth_create_initial_users
+          fi
       fi
 
       __start_daemon__ $daemon &
@@ -118,13 +126,13 @@ function password_auth_create_initial_users() {
     for row in ${AIRFLOW_INITIAL_USERS[@]}; do
         IFS="|" read -r -a user_infos <<< $row
 
-        echo "Creating user \"${user_infos[1]}\" on Airflow database..."ü
+        echo "Creating user \"${user_infos[0]}\" on Airflow database..."ü
 
-        airflow create_user --username $user_infos[1] \
-                            --password $user_infos[2] \
-                            --firstname $user_infos[3] \
-                            --lastname $user_infos[4] \
-                            --role $user_infos[5]
+        airflow create_user --username $user_infos[0] \
+                            --password $user_infos[1] \
+                            --firstname $user_infos[2] \
+                            --lastname $user_infos[3] \
+                            --role $user_infos[4]
     done
 
 }
@@ -152,14 +160,6 @@ if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
 
   # Start daemons
   start_daemons
-
-  # If Webserver authentication enabled and authentication type
-  # is username-password style, create initial users if defined
-  if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
-        "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
-        "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
-      password_auth_create_initial_users
-  fi
 
   tail -f /dev/null
 fi

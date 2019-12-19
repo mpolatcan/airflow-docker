@@ -18,10 +18,15 @@ services:
       AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
       AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
       AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
+      AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
+      WEBSERVER_AUTHENTICATE: "True"
+      WEBSERVER_RBAC: "True"
       AIRFLOW_DAEMONS: |
         scheduler
         webserver
         flower
+      AIRFLOW_INITIAL_USERS: |
+        mpolatcan|00190300|Mutlu|Polatcan|Admin
     ports:
       - 8080:8080
       - 5555:5555
