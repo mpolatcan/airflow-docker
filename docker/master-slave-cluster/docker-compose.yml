@@ -26,7 +26,7 @@ services:
         webserver
         flower
       AIRFLOW_INITIAL_USERS: |
-        mpolatcan|00190300|Mutlu|Polatcan|Admin
+        mpolatcan|12345|mutlupolatcan@gmail.com|Mutlu|Polatcan|Admin
     ports:
       - 8080:8080
       - 5555:5555

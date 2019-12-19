@@ -105,13 +105,14 @@ function password_auth_create_initial_users() {
     for row in ${AIRFLOW_INITIAL_USERS[@]}; do
         IFS="|" read -r -a user_infos <<< $row
 
-        echo "Creating user \"${user_infos[0]}\" on Airflow database..."ü
+        echo "Creating user \"${user_infos[0]}\" on Airflow database..."
 
         airflow create_user --username $user_infos[0] \
                             --password $user_infos[1] \
-                            --firstname $user_infos[2] \
-                            --lastname $user_infos[3] \
-                            --role $user_infos[4]
+                            --email $user_infos[2] \
+                            --firstname $user_infos[3] \
+                            --lastname $user_infos[4] \
+                            --role $user_infos[5]
     done
 
 }
