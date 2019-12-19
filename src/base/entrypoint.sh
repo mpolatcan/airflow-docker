@@ -13,7 +13,7 @@ __SERVICE_PORTS__[rabbitmq]="5672"
 AIRFLOW_COMPONENT_DATABASE="database"
 AIRFLOW_COMPONENT_BROKER="broker"
 AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker_result_backend"
-AIRFLOW_DAEMON_SCHEDULER="scheduler"
+AIRFLOW_DAEMON_WEBSERVER="webserver"
 AIRFLOW_EXECUTOR_CELERY="CeleryExecutor"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD="password"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_LDAP="ldap"
@@ -101,27 +101,6 @@ function __start_daemon__() {
     echo "Airflow daemon \"$daemon\" started successfully!"
 }
 
-function start_daemons() {
-  for daemon in ${AIRFLOW_DAEMONS[@]}; do
-      # Scheduler initializes Airflow database
-      if [[ "$daemon" == "${AIRFLOW_DAEMON_SCHEDULER}" ]]; then
-          echo "Initializing Airflow database..."
-
-          airflow initdb
-
-          # If Webserver authentication enabled and authentication type
-          # is username-password style, create initial users if defined
-          if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
-                "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
-                "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
-              password_auth_create_initial_users
-          fi
-      fi
-
-      __start_daemon__ $daemon &
-  done
-}
-
 function password_auth_create_initial_users() {
     for row in ${AIRFLOW_INITIAL_USERS[@]}; do
         IFS="|" read -r -a user_infos <<< $row
@@ -135,6 +114,27 @@ function password_auth_create_initial_users() {
                             --role $user_infos[4]
     done
 
+}
+
+function start_daemons() {
+  for daemon in ${AIRFLOW_DAEMONS[@]}; do
+      # Webserver initializes Airflow database and if Webserver authentication
+      # enabled and authentication type is username-password style, create initial
+      # users if defined
+      if [[ "$daemon" == "${AIRFLOW_DAEMON_WEBSERVER}" ]]; then
+          echo "Initializing Airflow database..."
+
+          airflow initdb
+
+          if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
+                "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
+                "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
+              password_auth_create_initial_users
+          fi
+      fi
+
+      __start_daemon__ $daemon &
+  done
 }
 
 if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
