@@ -4,31 +4,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-worker
+  name: airflow-master
   labels:
     app: airflow
-    unit: worker
+    unit: master
 spec:
   selector:
     matchLabels:
       app: airflow
-      unit: worker
+      unit: master
   template:
     metadata:
-      name: airflow-worker
+      name: airflow-master
       labels:
         app: airflow
-        unit: worker
+        unit: master
     spec:
       restartPolicy: Always
       containers:
-        - name: airflow-worker
+        - name: airflow-master
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
           env:
             - name: AIRFLOW_DAEMONS
               value: |
-                worker
+                scheduler
+                webserver
+                flower
           envFrom:
             - configMapRef:
-                name: airflow
+                name: airflow-config
+            - secretRef:
+                name: airflow-secret
+          ports:
+            - containerPort: 8080 # Airflow UI Port
+            - containerPort: 5555 # Celery Flower UI port

@@ -4,7 +4,7 @@
 version: "3.6"
 services:
   airflow-scheduler:
-    image: mpolatcan/airflow:1.10.6-python3.6-test
+    image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-scheduler
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
@@ -24,7 +24,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
-    image: mpolatcan/airflow:1.10.6-python3.6-test
+    image: mpolatcan/airflow:1.10.6-python3.6
     environment:
       CORE_EXECUTOR: "CeleryExecutor"
       AIRFLOW_DATABASE_TYPE: "postgresql"
@@ -43,13 +43,18 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-webserver:
-    image: mpolatcan/airflow:1.10.6-python3.6-test
+    image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-webserver
     environment:
       AIRFLOW_DATABASE_TYPE: "postgresql"
       AIRFLOW_DATABASE_HOST: "postgres"
       AIRFLOW_DATABASE_USER: "airflow"
       AIRFLOW_DATABASE_PASSWORD: "airflow"
+      AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
+      WEBSERVER_AUTHENTICATE: "True"
+      WEBSERVER_RBAC: "True"
+      AIRFLOW_INITIAL_USERS: |
+        mpolatcan|12345|mutlupolatcan@gmail.com|Mutlu|Polatcan|Admin
       AIRFLOW_DAEMONS: |
         webserver
     ports:
@@ -58,7 +63,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   celery-flower:
-    image: mpolatcan/airflow:1.10.6-python3.6-test
+    image: mpolatcan/airflow:1.10.6-python3.6
     container_name: celery-flower
     environment:
       AIRFLOW_DATABASE_TYPE: "postgresql"

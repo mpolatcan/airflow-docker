@@ -1,0 +1,18 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery-flower
+  labels:
+    app: airflow
+    unit: flower
+spec:
+  selector:
+    app: airflow
+    unit: flower
+  ports:
+    - port: 5555
+      targetPort: 5555
+  type: NodePort

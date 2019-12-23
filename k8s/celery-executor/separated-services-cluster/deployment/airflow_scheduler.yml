@@ -1,0 +1,34 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  labels:
+    app: airflow
+    unit: scheduler
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+      unit: scheduler
+  template:
+    metadata:
+      name: airflow-scheduler
+      labels:
+        app: airflow
+        unit: scheduler
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: airflow-scheduler
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          env:
+            - name: AIRFLOW_DAEMONS
+              value: |
+                scheduler
+          envFrom:
+            - configMapRef:
+                name: airflow-config
