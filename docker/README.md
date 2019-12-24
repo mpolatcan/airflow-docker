@@ -1,7 +1,7 @@
 # Airflow Pseudo Distributed Architecture with Celery Executor using Docker Compose
 
 
-## Architecture
+## Architectures
 
 ### Master - Worker Cluster
 
