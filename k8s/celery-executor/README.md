@@ -32,8 +32,8 @@ Generic architectures are cloud-agnostic that can be deploy or implemented on an
 Master-Worker cluster architecture of distributed **Airflow** consists of single Master container and multiple Worker 
 containers can scale up to n Worker containers. Master container runs three **Airflow** services which these are 
 **Scheduler**, **Webserver** and **Celery Flower** which monitors **Celery** workers. Worker containers runs **Airflow**
-**Worker** service. Also, this architecture includes main database, task queue broker and NFS as shared storage to share
-dags in master and wo. Main database can be type of **PostgreSQL**  or **MySQL* and this database can be run as **Docker** 
+**Worker** service. Also, this architecture includes main database, task queue broker and **NFS** as shared storage to share
+**Airflow** **DAGs** with master and worker. Main database can be type of **PostgreSQL**  or **MySQL** and this database can be run as **Docker** 
 container in **Kubernetes** cluster or managed service runs on cloud provider.
 
 ![](../../img/Airflow%20Distributed%20Architecture%20with%20Celery%20Executor%20on%20Kubernetes%20(Generic%20-%20Master%20Worker%20Pods).png)
