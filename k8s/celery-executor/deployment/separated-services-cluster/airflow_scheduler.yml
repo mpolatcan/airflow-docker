@@ -4,38 +4,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-master
+  name: airflow-scheduler
   labels:
     app: airflow
-    unit: master
+    unit: scheduler
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: airflow
-      unit: master
+      unit: scheduler
   template:
     metadata:
-      name: airflow-master
+      name: airflow-scheduler
       labels:
         app: airflow
-        unit: master
+        unit: scheduler
     spec:
       restartPolicy: Always
       containers:
-        - name: airflow-master
+        - name: airflow-scheduler
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
           env:
             - name: AIRFLOW_DAEMONS
               value: |
                 scheduler
-                webserver
-                flower
           envFrom:
             - configMapRef:
                 name: airflow-config
             - secretRef:
                 name: airflow-secret
-          ports:
-            - containerPort: 8080 # Airflow UI Port
-            - containerPort: 5555 # Celery Flower UI port
+          volumeMounts:
+            - mountPath: /home/airflow/airflow/dags
+              name: airflow-nfs
+              subPath: airflow/dags
+            - mountPath: /home/airflow/airflow/plugins
+              name: airflow-nfs
+              subPath: airflow/plugins
+      volumes:
+        - name: airflow-nfs
+          nfs:
+            path: /airflow-nfs
+            server: 10.128.0.25

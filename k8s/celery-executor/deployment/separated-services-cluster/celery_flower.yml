@@ -4,35 +4,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-webserver
+  name: celery-flower
   labels:
     app: airflow
-    unit: webserver
+    unit: flower
 spec:
   selector:
     matchLabels:
       app: airflow
-      unit: webserver
+      unit: flower
   template:
     metadata:
-      name: airflow-webserver
+      name: celery-flower
       labels:
         app: airflow
-        unit: webserver
+        unit: flower
     spec:
       restartPolicy: Always
       containers:
-        - name: airflow-webserver
+        - name: celery-flower
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
           env:
             - name: AIRFLOW_DAEMONS
               value: |
-                webserver
+                flower
           envFrom:
             - configMapRef:
                 name: airflow-config
             - secretRef:
                 name: airflow-secret
           ports:
-            - containerPort: 8080 # Airflow UI Port
+            - containerPort: 5555 # Celery Flower UI port

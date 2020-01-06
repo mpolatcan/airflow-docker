@@ -7,38 +7,20 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-scheduler
     environment:
-      CORE_EXECUTOR: "CeleryExecutor"
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_BROKER_TYPE: "redis"
-      AIRFLOW_BROKER_HOST: "redis"
-      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
-      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
-      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
-      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         scheduler
+    env_file:
+      - airflow_config.env
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
     image: mpolatcan/airflow:1.10.6-python3.6
     environment:
-      CORE_EXECUTOR: "CeleryExecutor"
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_BROKER_TYPE: "redis"
-      AIRFLOW_BROKER_HOST: "redis"
-      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
-      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
-      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
-      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         worker
+    env_file:
+      - airflow_config.env
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
@@ -46,17 +28,10 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-webserver
     environment:
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
-      WEBSERVER_AUTHENTICATE: "True"
-      WEBSERVER_RBAC: "True"
-      AIRFLOW_INITIAL_USERS: |
-        mpolatcan|12345|mutlupolatcan@gmail.com|Mutlu|Polatcan|Admin
       AIRFLOW_DAEMONS: |
         webserver
+    env_file:
+      - airflow_config.env
     ports:
       - 8080:8080
     volumes:
@@ -66,18 +41,10 @@ services:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: celery-flower
     environment:
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_BROKER_TYPE: "redis"
-      AIRFLOW_BROKER_HOST: "redis"
-      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
-      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
-      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
-      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         flower
+    env_file:
+      - airflow_config.env
     ports:
       - 5555:5555
     volumes:

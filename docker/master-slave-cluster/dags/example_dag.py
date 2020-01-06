@@ -4,12 +4,16 @@ from airflow.models import DAG
 from airflow.operators.bash_operator import BashOperator
 from datetime import datetime
 
+default_args = {
+    "owner": "mpolatcan"
+}
 
 dag = DAG(
     dag_id="example_dag",
     schedule_interval="*/1 * * * *",
     start_date=datetime(year=2019, month=12, day=11, hour=11, minute=50),
-    catchup=False
+    catchup=False,
+    default_args=default_args
 )
 
 echo_task_1 = BashOperator(

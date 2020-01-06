@@ -1,0 +1,62 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-worker
+  labels:
+    app: airflow
+    unit: worker
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+      unit: worker
+  template:
+    metadata:
+      name: airflow-worker
+      labels:
+        app: airflow
+        unit: worker
+    spec:
+      restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: unit
+                      operator: In
+                      values:
+                        - webserver
+                        - scheduler
+                        - worker
+              weight: 100
+      containers:
+        - name: airflow-worker
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          env:
+            - name: AIRFLOW_DAEMONS
+              value: |
+                worker
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+            - secretRef:
+                name: airflow-secret
+          volumeMounts:
+            - mountPath: /home/airflow/airflow/dags
+              name: airflow-nfs
+              subPath: airflow/dags
+            - mountPath: /home/airflow/airflow/plugins
+              name: airflow-nfs
+              subPath: airflow/plugins
+      volumes:
+        - name: airflow-nfs
+          nfs:
+            path: /airflow-nfs
+            server: 10.128.0.25

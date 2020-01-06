@@ -1,0 +1,64 @@
+# Written by Mutlu Polatcan
+# 17.12.2019
+# --------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+  labels:
+    app: airflow
+    unit: webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow
+      unit: webserver
+  template:
+    metadata:
+      name: airflow-webserver
+      labels:
+        app: airflow
+        unit: webserver
+    spec:
+      restartPolicy: Always
+      initContainers:
+        - name: airflow-nfs-init
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          command:
+            - /bin/bash
+          args:
+            - -c
+            - |
+              mkdir -p /airflow-nfs-mnt/airflow/{dags,plugins}
+              chown -R airflow:airflow /airflow-nfs-mnt/airflow
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /airflow-nfs-mnt
+              name: airflow-nfs
+      containers:
+        - name: airflow-webserver
+          image: mpolatcan/airflow:1.10.6-python3.6
+          imagePullPolicy: Always
+          env:
+            - name: AIRFLOW_DAEMONS
+              value: |
+                webserver
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+            - secretRef:
+                name: airflow-secret
+          ports:
+            - containerPort: 8080 # Airflow UI Port
+          volumeMounts:
+            - mountPath: /home/airflow/airflow
+              name: airflow-nfs
+              subPath: airflow
+      volumes:
+        - name: airflow-nfs
+          nfs:
+            path: /airflow-nfs
+            server: 10.128.0.5

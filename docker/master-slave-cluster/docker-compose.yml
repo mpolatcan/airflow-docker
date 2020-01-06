@@ -1,32 +1,18 @@
 # Written by Mutlu Polatcan
 # 12.11.2019
 # ------------------------------
-version: "3.6"
+version: "3.7"
 services:
   airflow-master:
     image: mpolatcan/airflow:1.10.6-python3.6
     container_name: airflow-master
     environment:
-      CORE_EXECUTOR: "CeleryExecutor"
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_BROKER_TYPE: "redis"
-      AIRFLOW_BROKER_HOST: "redis"
-      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
-      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
-      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
-      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
-      AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
-      WEBSERVER_AUTHENTICATE: "True"
-      WEBSERVER_RBAC: "True"
       AIRFLOW_DAEMONS: |
         scheduler
         webserver
         flower
-      AIRFLOW_INITIAL_USERS: |
-        mpolatcan|12345|mutlupolatcan@gmail.com|Mutlu|Polatcan|Admin
+    env_file:
+      - airflow_config.env
     ports:
       - 8080:8080
       - 5555:5555
@@ -36,19 +22,10 @@ services:
   airflow-worker:
     image: mpolatcan/airflow:1.10.6-python3.6
     environment:
-      CORE_EXECUTOR: "CeleryExecutor"
-      AIRFLOW_DATABASE_TYPE: "postgresql"
-      AIRFLOW_DATABASE_HOST: "postgres"
-      AIRFLOW_DATABASE_USER: "airflow"
-      AIRFLOW_DATABASE_PASSWORD: "airflow"
-      AIRFLOW_BROKER_TYPE: "redis"
-      AIRFLOW_BROKER_HOST: "redis"
-      AIRFLOW_BROKER_RESULT_BACKEND_TYPE: "postgresql"
-      AIRFLOW_BROKER_RESULT_BACKEND_HOST: "postgres"
-      AIRFLOW_BROKER_RESULT_BACKEND_USER: "airflow"
-      AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD: "airflow"
       AIRFLOW_DAEMONS: |
         worker
+    env_file:
+      - airflow_config.env
     volumes:
       - ./dags:/home/airflow/airflow/dags
 
@@ -64,3 +41,4 @@ services:
     image: redis
     container_name: redis
     hostname: redis
+
