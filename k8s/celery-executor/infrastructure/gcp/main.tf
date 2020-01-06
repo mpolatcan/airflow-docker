@@ -28,7 +28,7 @@ module "nfs_server" {
 resource "google_container_cluster" "gke_cluster" {
   name = var.gke_cluster_name
   location = var.gke_cluster_location
-  #master_version = var.gke_cluster_master_version
+  #master_version = var.gke_cluster_master_version # FIXME k8s master default version
   network = var.gke_cluster_network
 
   node_pool {
@@ -72,15 +72,11 @@ resource "google_container_cluster" "gke_cluster" {
 resource "google_sql_database_instance" "cloud_sql_instance" {
   name = var.cloud_sql_name
   database_version = local.gcp_cloud_sql_database_versions[
-    replace(
       format(
         local.database_version_fmt,
         var.cloud_sql_database_type,
         var.cloud_sql_database_version
-      ),
-      ".",
-      "_"
-    )
+      )
   ]
   region = var.cloud_sql_region
 

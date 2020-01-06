@@ -42,10 +42,10 @@ locals {
   }
 
   gcp_cloud_sql_database_versions={
-    mysql_5_6 = "MYSQL_5_6"
-    mysql_5_7 = "MYSQL_5_7"
-    postgres_9_6 = "POSTGRES_9_6"
-    postgres_11 = "POSTGRES_11"
+    "mysql_5.6" = "MYSQL_5_6"
+    "mysql_5.7" = "MYSQL_5_7"
+    "postgres_9.6" = "POSTGRES_9_6"
+    "postgres_11" = "POSTGRES_11"
   }
 
   gcp_memorystore_redis_versions={
@@ -115,7 +115,7 @@ variable "gke_cluster_node_pool_name" {
 }
 variable "gke_cluster_node_pool_initial_node_count" {
   type = string
-  default = 1
+  default = 3
 }
 variable "gke_cluster_node_pool_autoscaling_enabled" {
   type = bool
@@ -123,11 +123,11 @@ variable "gke_cluster_node_pool_autoscaling_enabled" {
 }
 variable "gke_cluster_node_pool_autoscaling_min_node_count" {
   type = number
-  default = null
+  default = 1
 }
 variable "gke_cluster_node_pool_autoscaling_max_node_count" {
   type = number
-  default = null
+  default = 3
 }
 variable "gke_cluster_node_pool_management_auto_repair" {
   type = bool
