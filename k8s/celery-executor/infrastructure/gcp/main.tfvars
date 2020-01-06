@@ -21,22 +21,11 @@ gke_cluster_location = "us-central1-a"
 # -----------------------------------------------------------------
 
 # --------------------- CLOUD SQL SETTINGS ------------------------
-cloud_sql_name = ""
-cloud_sql_database_version = ""
-cloud_sql_region = ""
-cloud_sql_settings_tier = ""
-cloud_sql_settings_disk_size = ""
-cloud_sql_settings_disk_autoresize = ""
-cloud_sql_user_name = ""
-cloud_sql_user_password = ""
+cloud_sql_name = "test"
+cloud_sql_region = "us-central1-a"
 # ----------------------------------------------------------------
 
 # --------------------- MEMORYSTORE SETTINGS ---------------------
-memorystore_instance_name = ""
-memorystore_instance_memory_size_gb = ""
-memorystore_redis_version = ""
-memorystore_display_name = ""
-memorystore_tier = "basic"
-memorystore_location_id = ""
-memorystore_alternative_location_id = ""
+memorystore_instance_name = "test"
+memorystore_location_id = "us-central1"
 # ----------------------------------------------------------------

@@ -1,6 +1,9 @@
+# TODO All Oauth scopes will be added
+
 locals {
   machine_type_fmt = "custom-%d-%d"
-  database_version_fmt = "%s-%s"
+  database_version_fmt = "%s_%s"
+
   gcp_default_network_cidrs={
     us-central1 = "10.128.0.0/20"
     europe-west1 = "10.132.0.0/20"
@@ -39,19 +42,20 @@ locals {
   }
 
   gcp_cloud_sql_database_versions={
-    mysql-5.6 = "MYSQL_5_6"
-    mysql-5.7 = "MYSQL_5_7"
-    postgres-9.6 = "POSTGRES_9_6"
+    mysql_5_6 = "MYSQL_5_6"
+    mysql_5_7 = "MYSQL_5_7"
+    postgres_9_6 = "POSTGRES_9_6"
     postgres_11 = "POSTGRES_11"
   }
 
   gcp_memorystore_redis_versions={
-    4.0 = "REDIS_4_0"
-    3.2 = "REDIS_3_2"
+    "4.0" = "REDIS_4_0"
+    "3.2" = "REDIS_3_2"
   }
 
   gcp_oauth_scopes={
     cloud-platform = "https://www.googleapis.com/auth/cloud-platform"
+    test = "https://www.googleapis.com/auth/test" # FIXME only test purpose
   }
 }
 
@@ -62,23 +66,23 @@ variable "nfs_server_machine_region" {type = string}
 variable "nfs_server_machine_zone" {type = string}
 variable "nfs_server_machine_vcpus" {
   type = number
-  default = ""
+  default = 2
 }
 variable "nfs_server_machine_memory_in_mb" {
   type = number
-  default = ""
+  default = 4096
 }
 variable "nfs_server_boot_disk_image" {
   type = string
-  default = ""
+  default = "ubuntu_1804"
 }
 variable "nfs_server_boot_disk_size" {
   type = number
-  default = ""
+  default = 100
 }
 variable "nfs_server_boot_disk_type" {
   type = string
-  default = ""
+  default = "hdd"
 }
 variable "nfs_server_network" {
   type = string
@@ -112,6 +116,10 @@ variable "gke_cluster_node_pool_name" {
 variable "gke_cluster_node_pool_initial_node_count" {
   type = string
   default = 1
+}
+variable "gke_cluster_node_pool_autoscaling_enabled" {
+  type = bool
+  default = false
 }
 variable "gke_cluster_node_pool_autoscaling_min_node_count" {
   type = number
@@ -192,7 +200,10 @@ variable "cloud_sql_user_password" {type = string}
 
 # ------------------------ MEMORYSTORE SETTINGS ----------------------
 variable "memorystore_instance_name" {type = string}
-variable "memorystore_instance_memory_size_gb" {type = number}
+variable "memorystore_instance_memory_size_gb" {
+  type = number
+  default = 1
+}
 variable "memorystore_redis_version" {
   type = string
   default = "4.0"

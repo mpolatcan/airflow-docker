@@ -8,7 +8,7 @@ provider "google" {
 
 
 module "nfs_server" {
-  source = "nfs"
+  source = "./nfs"
 
   nfs_server_machine_name = var.nfs_server_machine_name
   nfs_server_machine_region = var.nfs_server_machine_region
@@ -28,16 +28,19 @@ module "nfs_server" {
 resource "google_container_cluster" "gke_cluster" {
   name = var.gke_cluster_name
   location = var.gke_cluster_location
-  master_version = var.gke_cluster_master_version
+  #master_version = var.gke_cluster_master_version
   network = var.gke_cluster_network
 
   node_pool {
     name = var.gke_cluster_node_pool_name
     initial_node_count = var.gke_cluster_node_pool_initial_node_count
 
-    autoscaling {
-      max_node_count = var.gke_cluster_node_pool_autoscaling_max_node_count
-      min_node_count = var.gke_cluster_node_pool_autoscaling_min_node_count
+    dynamic autoscaling {
+      for_each = var.gke_cluster_node_pool_autoscaling_enabled == false ? [] : [1]
+      content {
+        max_node_count = var.gke_cluster_node_pool_autoscaling_max_node_count
+        min_node_count = var.gke_cluster_node_pool_autoscaling_min_node_count
+      }
     }
 
     management {
@@ -46,7 +49,7 @@ resource "google_container_cluster" "gke_cluster" {
     }
 
     node_config {
-      disk_type = var.gke_cluster_node_pool_node_config_disk_type
+      disk_type = local.gcp_disk_types[var.gke_cluster_node_pool_node_config_disk_type]
       disk_size_gb = var.gke_cluster_node_pool_node_config_disk_size_gb
       preemptible = var.gke_cluster_node_pool_node_config_preemptible
       machine_type = format(
@@ -69,10 +72,14 @@ resource "google_container_cluster" "gke_cluster" {
 resource "google_sql_database_instance" "cloud_sql_instance" {
   name = var.cloud_sql_name
   database_version = local.gcp_cloud_sql_database_versions[
-    format(
-      local.database_version_fmt,
-      var.cloud_sql_database_type,
-      var.cloud_sql_database_version
+    replace(
+      format(
+        local.database_version_fmt,
+        var.cloud_sql_database_type,
+        var.cloud_sql_database_version
+      ),
+      ".",
+      "_"
     )
   ]
   region = var.cloud_sql_region
