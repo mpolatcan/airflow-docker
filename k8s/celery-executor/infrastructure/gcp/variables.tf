@@ -2,6 +2,7 @@
 
 locals {
   machine_type_fmt = "custom-%d-%d"
+  database_machine_type_fmt = "db-custom-%d-%d"
   database_version_fmt = "%s_%s"
 
   gcp_default_network_cidrs={
@@ -31,9 +32,14 @@ locals {
     ubuntu_1910_minimal = "ubuntu-os-cloud/ubuntu-minimal-1910"
   }
 
-  gcp_disk_types={
+  gcp_gce_disk_types={
     ssd = "pd-ssd"
     hdd = "pd-standard"
+  }
+
+  gcp_cloud_sql_disk_types={
+    ssd = "PD_SSD"
+    hdd = "PD_HDD"
   }
 
   gcp_memorystore_tiers={
@@ -54,16 +60,42 @@ locals {
   }
 
   gcp_oauth_scopes={
-    cloud-platform = "https://www.googleapis.com/auth/cloud-platform"
-    test = "https://www.googleapis.com/auth/test" # FIXME only test purpose
+    "monitoring" = "https://www.googleapis.com/auth/monitoring"
+    "monitoring.read" = "https://www.googleapis.com/auth/monitoring.read"
+    "monitoring.write" = "https://www.googleapis.com/auth/monitoring.write"
+    "logging.admin" = "https://www.googleapis.com/auth/logging.admin"
+    "logging.read" = "https://www.googleapis.com/auth/logging.read"
+    "logging.write" = "https://www.googleapis.com/auth/logging.write"
+    "cloud-platform" = "https://www.googleapis.com/auth/cloud-platform"
+    "cloud-platform.readonly"= "https://www.googleapis.com/auth/cloud-platform.read-only"
+    "compute" = "https://www.googleapis.com/auth/compute"
+    "compute.read_only" = "https://www.googleapis.com/auth/compute.readonly"
+    "devstorage.full_control" = "https://www.googleapis.com/auth/devstorage.full_control"
+    "devstorage.read_only" = "https://www.googleapis.com/auth/devstorage.read_only"
+    "devstorage.read_write" = "https://www.googleapis.com/auth/devstorage.read_write"
+    "service.management" = "https://www.googleapis.com/auth/service.management"
+    "service.management.readonly" = "https://www.googleapis.com/auth/service.management.readonly"
   }
 }
 
+variable "credentials_file" {type = string}
+variable "project" {type = string}
+
 # ------------------------ NFS SERVER SETTINGS -----------------------
-variable "nfs_server_fileshare_name" {type = string}
-variable "nfs_server_machine_name" {type = string}
-variable "nfs_server_machine_region" {type = string}
-variable "nfs_server_machine_zone" {type = string}
+variable "nfs_server_fileshare_name" {
+  type = string
+}
+variable "nfs_server_machine_name" {
+  type = string
+}
+variable "nfs_server_machine_region" {
+  type = string
+  default = "us-central1"
+}
+variable "nfs_server_machine_zone" {
+  type = string
+  default = "a"
+}
 variable "nfs_server_machine_vcpus" {
   type = number
   default = 2
@@ -99,11 +131,12 @@ variable "nfs_server_sa_scopes" {
 # --------------------------------------------------------------------
 
 # ---------------------- GKE CLUSTER SETTINGS ------------------------
-variable "gke_cluster_name" {type = string}
-variable "gke_cluster_location" {type = string}
-variable "gke_cluster_master_version" {
+variable "gke_cluster_name" {
   type = string
-  default = null
+}
+variable "gke_cluster_location" {
+  type = string
+  default = "us-central1-a"
 }
 variable "gke_cluster_network" {
   type = string
@@ -161,11 +194,16 @@ variable "gke_cluster_node_pool_node_config_local_ssd_count" {
   type = number
   default = null
 }
-variable "gke_cluster_node_pool_node_config_oauth_scopes" {type = list(string)}
+variable "gke_cluster_node_pool_node_config_oauth_scopes" {
+  type = list(string)
+  default = ["cloud-platform"]
+}
 # --------------------------------------------------------------------
 
 # ------------------------ CLOUD SQL SETTINGS ------------------------
-variable "cloud_sql_name" {type = string}
+variable "cloud_sql_name" {
+  type = string
+}
 variable "cloud_sql_database_type" {
   type = string
   default = "postgres"
@@ -174,10 +212,21 @@ variable "cloud_sql_database_version" {
   type = string
   default = "11"
 }
-variable "cloud_sql_region" {type = string}
+variable "cloud_sql_region" {
+  type = string
+  default = "us-central1"
+}
 variable "cloud_sql_settings_tier" {
   type = string
-  default = "basic"
+  default = null
+}
+variable "cloud_sql_settings_machine_vcpus" {
+  type = number
+  default = 2
+}
+variable "cloud_sql_settings_machine_memory_in_mbs" {
+  type = number
+  default = 4096
 }
 variable "cloud_sql_settings_disk_size" {
   type = number
@@ -195,11 +244,15 @@ variable "cloud_sql_user_name" {
   type = string
   default = "postgres"
 }
-variable "cloud_sql_user_password" {type = string}
+variable "cloud_sql_user_password" {
+  type = string
+}
 # --------------------------------------------------------------------
 
 # ------------------------ MEMORYSTORE SETTINGS ----------------------
-variable "memorystore_instance_name" {type = string}
+variable "memorystore_instance_name" {
+  type = string
+}
 variable "memorystore_instance_memory_size_gb" {
   type = number
   default = 1
@@ -216,7 +269,10 @@ variable "memorystore_tier" {
   type = string
   default = "basic"
 }
-variable "memorystore_location_id" {type = string}
+variable "memorystore_location_id" {
+  type = string
+  default = "us-central1-a"
+}
 variable "memorystore_alternative_location_id" {
   type = string
   default = null

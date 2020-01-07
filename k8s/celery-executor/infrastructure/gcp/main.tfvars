@@ -17,15 +17,12 @@ nfs_server_fileshare_name = "test"
 
 # -------------------- GKE CLUSTER SETTINGS ------------------------
 gke_cluster_name = "airflow-cluster"
-gke_cluster_location = "us-central1-a"
 # -----------------------------------------------------------------
 
 # --------------------- CLOUD SQL SETTINGS ------------------------
 cloud_sql_name = "test"
-cloud_sql_region = "us-central1-a"
 # ----------------------------------------------------------------
 
 # --------------------- MEMORYSTORE SETTINGS ---------------------
 memorystore_instance_name = "test"
-memorystore_location_id = "us-central1"
 # ----------------------------------------------------------------
