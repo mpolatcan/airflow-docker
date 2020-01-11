@@ -80,9 +80,8 @@ function apply_default_ports_ifnotdef() {
 function __start_daemon__() {
     echo "Starting Airflow daemon \"$1\"..."
     airflow $1 -D
-    exec_result=$?
 
-    until [[ $exec_result -eq 0 ]]; do
+    until [[ -f "${AIRFLOW_HOME}/airflow-$daemon.err" ]]; do
         echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
 
         sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
@@ -94,8 +93,8 @@ function __start_daemon__() {
           exit 1
         fi
 
+        rm ${AIRFLOW_HOME}/airflow-$daemon.*
         airflow $1 -D
-        exec_result=$?
     done
 
     echo "Airflow daemon \"$daemon\" started successfully!"
