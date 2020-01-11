@@ -79,9 +79,10 @@ function apply_default_ports_ifnotdef() {
 # $1: daemon
 function __start_daemon__() {
     echo "Starting Airflow daemon \"$1\"..."
-    airflow $1 -D
+    airflow $1
+    exec_result=$?
 
-    until [[ -f "${AIRFLOW_HOME}/airflow-$daemon.err" ]]; do
+    until [[ $exec_result -eq 0 ]]; do
         echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
 
         sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
@@ -94,10 +95,9 @@ function __start_daemon__() {
         fi
 
         rm ${AIRFLOW_HOME}/airflow-$daemon.*
-        airflow $1 -D
+        airflow $1
+        exec_result=$?
     done
-
-    echo "Airflow daemon \"$daemon\" started successfully!"
 }
 
 function password_auth_create_initial_users() {
