@@ -94,8 +94,12 @@ function __start_daemon__() {
           exit 1
         fi
 
-        rm ${AIRFLOW_HOME}/airflow-$daemon.*
+        if [[ -f "${AIRFLOW_HOME}/airflow-$daemon.pid" ]]; then
+          rm "${AIRFLOW_HOME}/airflow-$daemon.pid"
+        fi
+
         airflow $1
+
         exec_result=$?
     done
 }
