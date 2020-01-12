@@ -24,9 +24,8 @@ ENV AIRFLOW_HOME="${AIRFLOW_USER_HOME}/airflow" \
     AIRFLOW_BROKER_RESULT_BACKEND_PORT="NULL" \
     AIRFLOW_BROKER_RESULT_BACKEND_USER="NULL" \
     AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD="NULL" \
-    AIRFLOW_HEALTHCHECK_INTERVAL_IN_SECS="2" \
     AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE="NULL" \
-    AIRFLOW_RETRY_INTERVAL_IN_SECS="1" \
+    AIRFLOW_RETRY_INTERVAL_IN_SECS="2" \
     AIRFLOW_MAX_RETRY_TIMES="-1" \
     AIRFLOW_INITIAL_USERS="NULL" \
 	CORE_DAGS_ARE_PAUSED_AT_CREATION="True" \
@@ -259,6 +258,9 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends nano \
                                                gcc \
                                                g++ \
+                                               iputils-ping \
+                                               dnsutils \
+                                               telnet \
                                                netcat \
                                                default-libmysqlclient-dev \
                                                libkrb5-dev \

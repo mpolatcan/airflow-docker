@@ -20,33 +20,47 @@ AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_LDAP="ldap"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GOOGLE="google"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GITHUB_ENTERPRISE="github_enterprise"
 
+# $1: message
+function __log__() {
+  echo "[$(date '+%d/%m/%Y %H:%M:%S')] -> $1"
+}
+
 # $1: Service name
 # $2: Service type
 # $3: Service hostname
 # $4: Service port
 function health_checker() {
-  echo "Airflow $1 healtcheck started ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
+  __log__ "Airflow $1 healtcheck started ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
   nc -z $3 $4
   result=$?
+  counter=0
 
   until [[ $result -eq 0 ]]; do
-    echo "Waiting $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
-    sleep ${AIRFLOW_HEALTHCHECK_INTERVAL_IN_SECS}
+    (( counter = counter + 1 ))
+
+    if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
+        __log__ "Airflow $1 healtcheck failed ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
+        __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
+        exit 1
+    fi
+
+    __log__ "Waiting $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\"). Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds... (times: $counter)."
+    sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
     nc -z $3 $4
     result=$?
   done
 
-  echo "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
+  __log__ "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
 }
 
 # $1: Service name
 # $2: Service host
 function __host_checker__() {
   if [[ "$2" == "NULL" ]]; then
-    echo "Airflow $1 host is not defined. Exiting ✘..."
+    __log__ "Airflow $1 host is not defined. Exiting ✘..."
     exit 1
   else
-    echo "Airflow $1 host is $2. OK ✔"
+    __log__ "Airflow $1 host is $2. OK ✔"
   fi
 }
 
@@ -61,36 +75,34 @@ function check_hosts_defined() {
 
 function apply_default_ports_ifnotdef() {
   if [[ "${AIRFLOW_DATABASE_PORT}" == "NULL" ]]; then
-      echo "Airflow database port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
+      __log__ "Airflow database port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
       export AIRFLOW_DATABASE_PORT=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_PORT}" == "NULL" ]]; then
-      echo "Airflow broker port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
+      __log__ "Airflow broker port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
       export AIRFLOW_BROKER_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}
   fi
 
   if [[ "${AIRFLOW_BROKER_RESULT_BACKEND_PORT}" == "NULL" ]]; then
-      echo "Airflow broker result backend port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
+      __log__ "Airflow broker result backend port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
       export AIRFLOW_BROKER_RESULT_BACKEND_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}
   fi
 }
 
 # $1: daemon
 function __start_daemon__() {
-    echo "Starting Airflow daemon \"$1\"..."
+    __log__ "Starting Airflow daemon \"$1\"..."
     airflow $1
     exec_result=$?
+    counter=0
 
     until [[ $exec_result -eq 0 ]]; do
-        echo "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds..."
-
-        sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-
         (( counter = counter + 1 ))
 
         if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-          echo "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
+          __log__ "Airflow daemon \"$daemon\" start failed!"
+          __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
           exit 1
         fi
 
@@ -98,8 +110,10 @@ function __start_daemon__() {
           rm "${AIRFLOW_HOME}/airflow-$daemon.pid"
         fi
 
-        airflow $1
+        __log__ "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds... (times: $counter)."
+        sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
 
+        airflow $1
         exec_result=$?
     done
 }
@@ -108,7 +122,7 @@ function password_auth_create_initial_users() {
     for row in ${AIRFLOW_INITIAL_USERS[@]}; do
         IFS="|" read -r -a user_infos <<< $row
 
-        echo "Creating user \"${user_infos[0]}\" on Airflow database..."
+        __log__ "Creating user \"${user_infos[0]}\" on Airflow database..."
 
         airflow create_user --username ${user_infos[0]} \
                             --password ${user_infos[1]} \
@@ -126,7 +140,7 @@ function start_daemons() {
       # enabled and authentication type is username-password style, create initial
       # users if defined
       if [[ "$daemon" == "${AIRFLOW_DAEMON_WEBSERVER}" ]]; then
-          echo "Initializing Airflow database..."
+          __log__ "Initializing Airflow database..."
 
           airflow initdb
 
