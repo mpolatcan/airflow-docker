@@ -11,8 +11,8 @@ K8S_FILE_PATHS=(
   # ------------------------------
   # --------- Services -----------
   "service/master-slave-cluster/airflow_master.yml"
-  #"service/postgres.yml" Containerized Postgresql service definition if Postgresql not managed service comment out line
-  #"service/redis.yml" Containerized Redis service definition
+  #"service/common/postgres.yml" Containerized Postgresql service definition if Postgresql not managed service comment out line
+  #"service/common/redis.yml" Containerized Redis service definition
   # ------------------------------
   # ----------- Ingress ----------
   "ingress/master-slave-cluster/airflow_ui.yml"
@@ -20,8 +20,8 @@ K8S_FILE_PATHS=(
   # -------- Deployments ---------
   "deployment/master-slave-cluster/airflow_master.yml"
   "deployment/master-slave-cluster/airflow_worker.yml"
-  #"deployment/master-slave-cluster/postgres.yml" Containerized Postgresql deployment if Postgresql not managed service comment out line
-  #"deployment/master-slave-cluster/redis.yml" Containerized Redis deployment if Redis not managed service comment out line
+  #"deployment/common/postgres.yml" Containerized Postgresql deployment if Postgresql not managed service comment out line
+  #"deployment/common/redis.yml" Containerized Redis deployment if Redis not managed service comment out line
   # ------------------------------
 )
 

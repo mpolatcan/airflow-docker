@@ -12,8 +12,8 @@ K8S_FILE_PATHS=(
   # --------- Services -----------
   "service/separated-services-cluster/airflow_webserver.yml"
   "service/separated-services-cluster/celery_flower.yml"
-  #"service/separated-services-cluster/postgres.yml" Containerized Postgresql service definition if Postgresql not managed service comment out line
-  #"service/separated-services-cluster/redis.yml" Containerized Redis service definition if Postgresql not managed service comment out line
+  #"service/common/postgres.yml" Containerized Postgresql service definition if Postgresql not managed service comment out line
+  #"service/common/redis.yml" Containerized Redis service definition if Postgresql not managed service comment out line
   # ------------------------------
   # ----------- Ingress ----------
   "ingress/separated-services-cluster/airflow_ui.yml"
@@ -23,8 +23,8 @@ K8S_FILE_PATHS=(
   "deployment/separated-services-cluster/airflow_scheduler.yml"
   "deployment/separated-services-cluster/airflow_worker.yml"
   "deployment/separated-services-cluster/celery_flower.yml"
-  #"deployment/separated-services-cluster/postgres.yml" Containerized Postgresql deployment if Postgresql not managed service comment out line
-  #"deployment/separated-services-cluster/redis.yml" Containerized Redis deployment if Redis not managed service comment out line
+  #"deployment/common/postgres.yml" Containerized Postgresql deployment if Postgresql not managed service comment out line
+  #"deployment/common/redis.yml" Containerized Redis deployment if Redis not managed service comment out line
   # ------------------------------
 )
 
