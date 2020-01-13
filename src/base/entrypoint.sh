@@ -136,21 +136,6 @@ function password_auth_create_initial_users() {
 
 function start_daemons() {
   for daemon in ${AIRFLOW_DAEMONS[@]}; do
-      # Webserver initializes Airflow database and if Webserver authentication
-      # enabled and authentication type is username-password style, create initial
-      # users if defined
-      if [[ "$daemon" == "${AIRFLOW_DAEMON_WEBSERVER}" ]]; then
-          __log__ "Initializing Airflow database..."
-
-          airflow initdb
-
-          if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
-                "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
-                "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
-              password_auth_create_initial_users
-          fi
-      fi
-
       __start_daemon__ $daemon &
   done
 }
@@ -174,6 +159,16 @@ if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
 
     # Check result backend is ready
     health_checker ${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND} ${AIRFLOW_BROKER_RESULT_BACKEND_TYPE} ${AIRFLOW_BROKER_RESULT_BACKEND_HOST} ${AIRFLOW_BROKER_RESULT_BACKEND_PORT}
+  fi
+
+  __log__ "Initializing Airflow database..."
+
+  airflow initdb
+
+  if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
+        "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
+        "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
+      password_auth_create_initial_users
   fi
 
   # Start daemons
