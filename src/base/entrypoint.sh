@@ -146,15 +146,15 @@ function start_daemons() {
   done
 }
 
+# Load Airflow configuration from environment variables and save to "airflow.cfg"
+./airflow_config_loader.sh
+
 if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
   # If required components hostname not defined raise error
   check_hosts_defined
 
   # Load default database and broker ports if not defined in environment variables
   apply_default_ports_ifnotdef
-
-  # Load Airflow configuration from environment variables and save to "airflow.cfg"
-  ./airflow_config_loader.sh
 
   # Check database is ready
   health_checker ${AIRFLOW_COMPONENT_DATABASE} ${AIRFLOW_DATABASE_TYPE} ${AIRFLOW_DATABASE_HOST} ${AIRFLOW_DATABASE_PORT}
