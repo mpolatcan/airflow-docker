@@ -4,24 +4,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-webserver
+  name: airflow-master
   labels:
     app: airflow
-    unit: webserver
+    unit: master
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: airflow
-      unit: webserver
+      unit: master
   template:
     metadata:
-      name: airflow-webserver
+      name: airflow-master
       labels:
         app: airflow
-        unit: webserver
+        unit: master
     spec:
+      serviceAccountName: airflow
       restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchExpressions:
+                    - key: unit
+                      operator: In
+                      values:
+                        - master
+                        - worker
+              weight: 100
       initContainers:
         - name: airflow-nfs-init
           image: mpolatcan/airflow:1.10.6-python3.6
@@ -39,12 +52,13 @@ spec:
             - mountPath: /airflow-nfs-mnt
               name: airflow-nfs
       containers:
-        - name: airflow-webserver
+        - name: airflow-master
           image: mpolatcan/airflow:1.10.6-python3.6
           imagePullPolicy: Always
           env:
             - name: AIRFLOW_DAEMONS
               value: |
+                scheduler
                 webserver
           envFrom:
             - configMapRef:
@@ -53,6 +67,7 @@ spec:
                 name: airflow-secret
           ports:
             - containerPort: 8080 # Airflow UI Port
+            - containerPort: 5555 # Celery Flower UI port
           volumeMounts:
             - mountPath: /home/airflow/airflow
               name: airflow-nfs

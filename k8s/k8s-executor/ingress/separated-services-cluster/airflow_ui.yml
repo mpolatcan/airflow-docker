@@ -1,0 +1,18 @@
+# Written by Mutlu Polatcan
+# 18.12.2019
+# -------------------------
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: airflow-ui-ingress
+  labels:
+    app: airflow
+    unit: ui-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: airflow-webserver
+              servicePort: 8080

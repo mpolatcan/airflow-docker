@@ -1,0 +1,35 @@
+# Written by Mutlu Polatcan
+# 15.01.2020
+# -------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airlfow-nfs-pv-ro
+  labels:
+    app: airflow
+    storage: nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadOnlyMany
+  nfs:
+    path: /airflow-nfs
+    server: 10.128.0.25
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-nfs-pvc-ro
+  labels:
+    app: airflow
+spec:
+  selector:
+    matchLabels:
+      storage: nfs
+  storageClassName: ""
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi  # this is only arbitrary number, not real capacity of NFS storage

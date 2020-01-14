@@ -56,6 +56,5 @@ spec:
               subPath: airflow/plugins
       volumes:
         - name: airflow-nfs
-          nfs:
-            path: /airflow-nfs
-            server: 10.128.0.32
+          persistentVolumeClaim:
+            claimName: airflow-nfs-pvc-rw

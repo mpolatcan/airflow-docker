@@ -5,7 +5,7 @@ provider "google" {
 
 
 module "nfs_server" {
-  source = "./nfs"
+  source = "nfs"
 
   nfs_server_machine_name = var.nfs_server_machine_name
   nfs_server_machine_region = var.nfs_server_machine_region
@@ -22,7 +22,7 @@ module "nfs_server" {
 }
 
 module "gke" {
-  source = "./gke"
+  source = "gke"
 
   gke_cluster_name = var.gke_cluster_name
   gke_cluster_location = var.gke_cluster_location
@@ -49,7 +49,7 @@ module "gke" {
 }
 
 module "cloud_sql" {
-  source = "./cloud_sql"
+  source = "cloud_sql"
 
   cloud_sql_name = var.cloud_sql_name
   cloud_sql_database_version = local.gcp_cloud_sql_database_versions[
@@ -73,7 +73,7 @@ module "cloud_sql" {
 }
 
 module "memorystore" {
-  source = "./memorystore"
+  source = "memorystore"
 
   memorystore_instance_name = var.memorystore_instance_name
   memorystore_instance_memory_size_gb = var.memorystore_instance_memory_size_gb

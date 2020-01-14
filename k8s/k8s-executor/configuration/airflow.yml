@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config
+  labels:
+    app: airflow
+data:
+  CORE_EXECUTOR: "KubernetesExecutor"
+  AIRFLOW_DATABASE_TYPE: "postgresql"
+  AIRFLOW_DATABASE_HOST: "postgres"
+  AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
+  WEBSERVER_AUTHENTICATE: "True"
+  WEBSERVER_RBAC: "True"
+  KUBERNETES_NAMESPACE: "airflow"
+  KUBERNETES_DAGS_VOLUME_HOST: "/home/airflow/airflow/dags"
+  KUBERNETES_WORKER_CONTAINER_REPOSITORY: "mpolatcan/airflow"
+  KUBERNETES_WORKER_CONTAINER_TAG: "1.10.6-python3.6"
+  KUBERNETES_WORKER_SERVICE_ACCOUNT_NAME: "airflow"
+  KUBERNETES_WORKER_CONTAINER_IMAGE_PULL_POLICY: "IfNotPresent"
+  KUBERNETES_ENV_FROM_CONFIGMAP_REF: "airflow-config"
+  KUBERNETES_ENV_FROM_SECRET_REF: "airflow-secret"
+  KUBERNETES_DELETE_WORKER_PODS: "False"
+  KUBERNETES_DAGS_VOLUME_CLAIM: "airflow-nfs-pvc-ro"
+  KUBERNETES_DAGS_VOLUME_SUBPATH: "airflow/dags"
+  KUBERNETES_LOGS_VOLUME_CLAIM: "airflow-nfs-pvc-rw"
+  KUBERNETES_LOGS_VOLUME_SUBPATH: "airflow/logs"

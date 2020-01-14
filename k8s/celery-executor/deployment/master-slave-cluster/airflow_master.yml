@@ -74,6 +74,5 @@ spec:
               subPath: airflow
       volumes:
         - name: airflow-nfs
-          nfs:
-            path: /airflow-nfs
-            server: 10.128.0.25
+          persistentVolumeClaim:
+            claimName: airflow-nfs-pvc-rw
