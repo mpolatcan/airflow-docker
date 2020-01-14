@@ -90,8 +90,16 @@ function apply_default_ports_ifnotdef() {
   fi
 }
 
+function __delete_pid_file__() {
+    # if pid file is already exists, firstly delete it then run airflow service
+    if [[ -f "${AIRFLOW_HOME}/airflow-$daemon.pid" ]]; then
+        rm "${AIRFLOW_HOME}/airflow-$daemon.pid"
+    fi
+}
 # $1: daemon
 function __start_daemon__() {
+    __delete_pid_file__ $daemon
+
     __log__ "Starting Airflow daemon \"$1\"..."
     airflow $1
     exec_result=$?
@@ -106,9 +114,7 @@ function __start_daemon__() {
           exit 1
         fi
 
-        if [[ -f "${AIRFLOW_HOME}/airflow-$daemon.pid" ]]; then
-          rm "${AIRFLOW_HOME}/airflow-$daemon.pid"
-        fi
+        __delete_pid_file__ $daemon
 
         __log__ "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds... (times: $counter)."
         sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
