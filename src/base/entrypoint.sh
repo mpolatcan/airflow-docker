@@ -161,6 +161,7 @@ function check_and_load_configs() {
   if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
     __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
     kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg"
+    kubectl label configmap airflow-worker-config
   fi
 }
 
