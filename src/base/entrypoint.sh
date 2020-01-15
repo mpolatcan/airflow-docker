@@ -157,11 +157,11 @@ function check_and_load_configs() {
   # Load Airflow configuration from environment variables and save to "airflow.cfg"
   ./airflow_config_loader.sh
 
-  # Add configuration file as configmap to Kubernetes cluster if executor is KubernetesExecutor
+  # Add configuration file as ConfigMap to Kubernetes cluster if executor is KubernetesExecutor
   if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
     __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
     kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg"
-    kubectl label configmap airflow-worker-config
+    kubectl label configmap airflow-worker-config app=airflow
   fi
 }
 
