@@ -15,6 +15,7 @@ AIRFLOW_COMPONENT_BROKER="broker"
 AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND="broker_result_backend"
 AIRFLOW_DAEMON_WEBSERVER="webserver"
 AIRFLOW_EXECUTOR_CELERY="CeleryExecutor"
+AIRFLOW_EXECUTOR_KUBERNETES="KubernetesExecutor"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD="password"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_LDAP="ldap"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GOOGLE="google"
@@ -39,7 +40,7 @@ function health_checker() {
     (( counter = counter + 1 ))
 
     if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-        __log__ "Airflow $1 healtcheck failed ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
+        __log__ "Airflow $1 healthcheck failed ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
         __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
         exit 1
     fi
@@ -155,6 +156,12 @@ function check_and_load_configs() {
 
   # Load Airflow configuration from environment variables and save to "airflow.cfg"
   ./airflow_config_loader.sh
+
+  # Add configuration file as configmap to Kubernetes cluster if executor is KubernetesExecutor
+  if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
+    __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
+    kubectl create configmap airflow-config --from-file "${AIRFLOW_HOME}/airflow.cfg"
+  fi
 }
 
 function run_healthchecks() {

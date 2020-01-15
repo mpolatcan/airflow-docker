@@ -254,7 +254,9 @@ ENV PATH=${AIRFLOW_VIRTUALENV}/bin:$PATH
 ADD entrypoint.sh ${AIRFLOW_USER_HOME}/airflow_entrypoint.sh
 ADD config_loader.sh ${AIRFLOW_USER_HOME}/airflow_config_loader.sh
 
-RUN apt-get update && \
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
+    apt-get update && \
     apt-get -y install --no-install-recommends nano \
                                                gcc \
                                                g++ \
@@ -264,7 +266,9 @@ RUN apt-get update && \
                                                netcat \
                                                default-libmysqlclient-dev \
                                                libkrb5-dev \
-                                               libsasl2-dev && \
+                                               libsasl2-dev \
+                                               apt-transport-https \
+                                               kubectl && \
     rm -rf /var/lib/apt/lists/* && \
     addgroup airflow && adduser --disabled-password --gecos "" --ingroup airflow airflow && \
     mkdir -p ${AIRFLOW_USER_HOME} && \
