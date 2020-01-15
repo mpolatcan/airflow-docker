@@ -5,14 +5,14 @@ metadata:
   labels:
     app: airflow
 data:
-  CORE_EXECUTOR: "KubernetesExecutor"
   AIRFLOW_DATABASE_TYPE: "postgresql"
   AIRFLOW_DATABASE_HOST: "postgres"
   AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE: "password"
   WEBSERVER_AUTHENTICATE: "True"
   WEBSERVER_RBAC: "True"
+  CORE_EXECUTOR: "KubernetesExecutor"
   KUBERNETES_NAMESPACE: "airflow"
-  KUBERNETES_DAGS_VOLUME_HOST: "/home/airflow/airflow/dags"
+  KUBERNETES_AIRFLOW_CONFIGMAP: "airflow-worker-config"
   KUBERNETES_WORKER_CONTAINER_REPOSITORY: "mpolatcan/airflow"
   KUBERNETES_WORKER_CONTAINER_TAG: "1.10.6-python3.6"
   KUBERNETES_WORKER_SERVICE_ACCOUNT_NAME: "airflow"
