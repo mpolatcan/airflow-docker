@@ -160,8 +160,9 @@ function check_and_load_configs() {
   # Add configuration file as ConfigMap to Kubernetes cluster if executor is KubernetesExecutor
   if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
     __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
-    kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg" --dry-run=true -o yaml | kubectl apply -f -
-    kubectl label configmap airflow-worker-config app=airflow
+    kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg" --dry-run=true -o yaml > airflow_worker_config.yml
+    kubectl apply -f airflow_worker_config.yml
+    kubectl label configmap airflow-worker-config app=airflow --overwrite=True
   fi
 }
 
