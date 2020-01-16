@@ -275,5 +275,5 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
     mkdir -p ${AIRFLOW_HOME} ${AIRFLOW_VIRTUALENV} && \
     pip3 install virtualenv psycopg2-binary && \
     virtualenv -p python3 ${AIRFLOW_VIRTUALENV} && \
-    ${AIRFLOW_VIRTUALENV}/bin/pip3 install "pymssql<3.0" && \
+    ${AIRFLOW_VIRTUALENV}/bin/pip3 install "pymssql<3.0" statsd && \
     chmod +x ${AIRFLOW_USER_HOME}/airflow_entrypoint.sh ${AIRFLOW_USER_HOME}/airflow_config_loader.sh
