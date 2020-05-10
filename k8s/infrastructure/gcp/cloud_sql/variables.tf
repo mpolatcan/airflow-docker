@@ -1,9 +1,0 @@
-variable "cloud_sql_name" {type = string}
-variable "cloud_sql_database_version" {type = string}
-variable "cloud_sql_region" {type = string}
-variable "cloud_sql_settings_tier" {type = string}
-variable "cloud_sql_settings_disk_size" {type = number}
-variable "cloud_sql_settings_disk_type" {type = string}
-variable "cloud_sql_settings_disk_autoresize" {type = bool}
-variable "cloud_sql_user_name" {type = string}
-variable "cloud_sql_user_password" {type = string}
