@@ -1,4 +1,2 @@
 .idea
-.terraform
-gcp_credentials.json
-.tfstate
+__pycache__/

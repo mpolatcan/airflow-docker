@@ -4,7 +4,7 @@
 version: "3.6"
 services:
   airflow-scheduler:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     container_name: airflow-scheduler
     environment:
       AIRFLOW_DAEMONS: |
@@ -15,7 +15,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     environment:
       AIRFLOW_DAEMONS: |
         worker
@@ -25,7 +25,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-webserver:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     container_name: airflow-webserver
     environment:
       AIRFLOW_DAEMONS: |
@@ -38,7 +38,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   celery-flower:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     container_name: celery-flower
     environment:
       AIRFLOW_DAEMONS: |

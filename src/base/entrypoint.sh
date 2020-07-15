@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Written by Mutlu Polatcan
 # 17.12.2019
@@ -17,113 +17,90 @@ AIRFLOW_DAEMON_WEBSERVER="webserver"
 AIRFLOW_EXECUTOR_CELERY="CeleryExecutor"
 AIRFLOW_EXECUTOR_KUBERNETES="KubernetesExecutor"
 AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD="password"
-AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_LDAP="ldap"
-AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GOOGLE="google"
-AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_GITHUB_ENTERPRISE="github_enterprise"
 
 # $1: message
 function __log__() {
-  echo "[$(date '+%d/%m/%Y %H:%M:%S')] -> $1"
+    echo "[$(date '+%d/%m/%Y %H:%M:%S')] -> $1"
 }
 
-# $1: Service name
-# $2: Service type
-# $3: Service hostname
-# $4: Service port
-function health_checker() {
-  __log__ "Airflow $1 healtcheck started ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
-  nc -z $3 $4
-  result=$?
-  counter=0
-
-  until [[ $result -eq 0 ]]; do
-    (( counter = counter + 1 ))
-
-    if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-        __log__ "Airflow $1 healthcheck failed ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..."
-        __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
-        exit 1
-    fi
-
-    __log__ "Waiting $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\"). Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds... (times: $counter)."
-    sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-    nc -z $3 $4
-    result=$?
-  done
-
-  __log__ "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
-}
-
-# $1: Service name
-# $2: Service host
-function __host_checker__() {
-  if [[ "$2" == "NULL" ]]; then
-    __log__ "Airflow $1 host is not defined. Exiting ✘..."
-    exit 1
-  else
-    __log__ "Airflow $1 host is $2. OK ✔"
-  fi
-}
-
-function check_hosts_defined() {
-    __host_checker__ "${AIRFLOW_COMPONENT_DATABASE}" "${AIRFLOW_DATABASE_HOST}"
-
-    if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_CELERY}" ]]; then
-        __host_checker__ "${AIRFLOW_COMPONENT_BROKER}" "${AIRFLOW_BROKER_HOST}"
-        __host_checker__ "${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND}" "${AIRFLOW_BROKER_RESULT_BACKEND_HOST}"
-    fi
-}
-
-function apply_default_ports_ifnotdef() {
-  if [[ "${AIRFLOW_DATABASE_PORT}" == "NULL" ]]; then
-      __log__ "Airflow database port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}\" will be used!"
-      export AIRFLOW_DATABASE_PORT=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE}]}
-  fi
-
-  if [[ "${AIRFLOW_BROKER_PORT}" == "NULL" ]]; then
-      __log__ "Airflow broker port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}\" will be used!"
-      export AIRFLOW_BROKER_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE}]}
-  fi
-
-  if [[ "${AIRFLOW_BROKER_RESULT_BACKEND_PORT}" == "NULL" ]]; then
-      __log__ "Airflow broker result backend port is not defined. Default port \"${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}\" will be used!"
-      export AIRFLOW_BROKER_RESULT_BACKEND_PORT=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}]}
-  fi
-}
-
-function __delete_pid_file__() {
-    # if pid file is already exists, firstly delete it then run airflow service
-    if [[ -f "${AIRFLOW_HOME}/airflow-$daemon.pid" ]]; then
-        rm "${AIRFLOW_HOME}/airflow-$daemon.pid"
-    fi
-}
-# $1: daemon
-function __start_daemon__() {
-    __delete_pid_file__ $daemon
-
-    __log__ "Starting Airflow daemon \"$1\"..."
-    airflow $1
-    exec_result=$?
+# $1: Running command
+# $2: Start message
+# $3: Max retry times reached message
+# $4: Retry message
+# $5: Success message
+function __retry_loop__() {
+    __log__ "$2"
     counter=0
+    $1
 
-    until [[ $exec_result -eq 0 ]]; do
+    until [[ $? -eq 0 ]]; do
         (( counter = counter + 1 ))
 
-        if [[ ${AIRFLOW_MAX_RETRY_TIMES} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES} ]]; then
-          __log__ "Airflow daemon \"$daemon\" start failed!"
-          __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES}\" reached. Exiting now..."
-          exit 1
+        if [[ ${AIRFLOW_MAX_RETRY_TIMES:=-1} -ne -1 && $counter -ge ${AIRFLOW_MAX_RETRY_TIMES:=-1} ]]; then
+            __log__ "$3"
+            __log__ "Max retry times \"${AIRFLOW_MAX_RETRY_TIMES:=-1}\" reached. Exiting ✘..."
+            exit 1
         fi
 
-        __delete_pid_file__ $daemon
-
-        __log__ "Airflow daemon \"$daemon\" couldn't be started. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS} seconds... (times: $counter)."
-        sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS}
-
-        airflow $1
-        exec_result=$?
+        __log__ "$4. Retrying after ${AIRFLOW_RETRY_INTERVAL_IN_SECS:=2} seconds... (times: $counter)."
+        sleep ${AIRFLOW_RETRY_INTERVAL_IN_SECS:=2}
+        $1
     done
+
+    __log__ "$5"
 }
+
+# $1: Component name
+# $2: Component type
+# $3: Component hostname
+# $4: Component port
+function health_checker() {
+    if [[ "$3" == "" ]]; then
+        __log__ "Airflow $1 host is not defined. Exiting ✘..."
+        exit 1
+    else
+        __log__ "Superset $1 host is $3. OK ✔"
+    fi
+
+    __retry_loop__ "nc -z $3 $4" \
+                   "Airflow $1 healthcheck started ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..." \
+                   "Airflow $1 healthcheck failed ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")..." \
+                   "Waiting $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\")" \
+                   "Airflow $1 is ready ($1_type: \"$2\", $1_host: \"$3\", $1_port: \"$4\") ✔"
+}
+
+function run_healthchecks() {
+    # Check database is ready
+    health_checker ${AIRFLOW_COMPONENT_DATABASE} ${AIRFLOW_DATABASE_TYPE:=postgresql} \
+                   ${AIRFLOW_DATABASE_HOST:=NULL} ${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}
+
+    if [[ "${CORE_EXECUTOR:=SequentialExecutor}" == "${AIRFLOW_EXECUTOR_CELERY}" ]]; then
+        # Check broker is ready
+        health_checker ${AIRFLOW_COMPONENT_BROKER} ${AIRFLOW_BROKER_TYPE:=redis} \
+                       ${AIRFLOW_BROKER_HOST:=NULL} ${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}
+
+        # Check result backend is ready
+        health_checker ${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND} ${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql} \
+                       ${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL} ${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql]}]}}
+    fi
+}
+
+# ======================================================================================================================
+
+function load_configs() {
+    # Load Airflow configuration from environment variables and save to "airflow.cfg"
+    ./airflow_config_loader.sh
+
+    # Add configuration file as ConfigMap to Kubernetes cluster if executor is KubernetesExecutor
+    if [[ "${CORE_EXECUTOR:=SequentialExecutor}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
+        __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
+        kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg" --dry-run=true -o yaml > airflow_worker_config.yml
+        kubectl apply -f airflow_worker_config.yml
+        kubectl label configmap airflow-worker-config app=airflow --overwrite=True
+    fi
+}
+
+# ======================================================================================================================
 
 function password_auth_create_initial_users() {
     for row in ${AIRFLOW_INITIAL_USERS[@]}; do
@@ -138,72 +115,40 @@ function password_auth_create_initial_users() {
                             --lastname ${user_infos[4]} \
                             --role ${user_infos[5]}
     done
-
-}
-
-function start_daemons() {
-  for daemon in ${AIRFLOW_DAEMONS[@]}; do
-      __start_daemon__ $daemon &
-  done
-}
-
-function check_and_load_configs() {
-  # If required components hostname not defined raise error
-  check_hosts_defined
-
-  # Load default database and broker ports if not defined in environment variables
-  apply_default_ports_ifnotdef
-
-  # Load Airflow configuration from environment variables and save to "airflow.cfg"
-  ./airflow_config_loader.sh
-
-  # Add configuration file as ConfigMap to Kubernetes cluster if executor is KubernetesExecutor
-  if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_KUBERNETES}" ]]; then
-    __log__ "Creating Kubernetes ConfigMap \"airflow-config\" in namespace ${KUBERNETES_NAMESPACE}..."
-    kubectl create configmap airflow-worker-config --from-file "${AIRFLOW_HOME}/airflow.cfg" --dry-run=true -o yaml > airflow_worker_config.yml
-    kubectl apply -f airflow_worker_config.yml
-    kubectl label configmap airflow-worker-config app=airflow --overwrite=True
-  fi
-}
-
-function run_healthchecks() {
-  # Check database is ready
-  health_checker ${AIRFLOW_COMPONENT_DATABASE} ${AIRFLOW_DATABASE_TYPE} ${AIRFLOW_DATABASE_HOST} ${AIRFLOW_DATABASE_PORT}
-
-  if [[ "${CORE_EXECUTOR}" == "${AIRFLOW_EXECUTOR_CELERY}" ]]; then
-    # Check broker is ready
-    health_checker ${AIRFLOW_COMPONENT_BROKER} ${AIRFLOW_BROKER_TYPE} ${AIRFLOW_BROKER_HOST} ${AIRFLOW_BROKER_PORT}
-
-    # Check result backend is ready
-    health_checker ${AIRFLOW_COMPONENT_BROKER_RESULT_BACKEND} ${AIRFLOW_BROKER_RESULT_BACKEND_TYPE} ${AIRFLOW_BROKER_RESULT_BACKEND_HOST} ${AIRFLOW_BROKER_RESULT_BACKEND_PORT}
-  fi
 }
 
 function initialize_airflow_database() {
-  __log__ "Initializing Airflow database..."
+    __log__ "Initializing Airflow database..."
 
-  airflow initdb
+    airflow initdb
 
-  if [[ "${WEBSERVER_AUTHENTICATE}" == "True" && \
-        "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
-        "${AIRFLOW_INITIAL_USERS}" != "NULL" ]]; then
-      password_auth_create_initial_users
-  fi
+    if [[ "${WEBSERVER_AUTHENTICATE:=False}" == "True" && \
+          "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE:=NULL}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
+          "${AIRFLOW_INITIAL_USERS:=NULL}" != "NULL" ]]; then
+        password_auth_create_initial_users
+    fi
 }
 
+# ======================================================================================================================
+
 function main() {
-  check_and_load_configs
+    if [[ "${AIRFLOW_DAEMONS:=NULL}" != "NULL" ]]; then
+        run_healthchecks
 
-  if [[ "${AIRFLOW_DAEMONS}" != "NULL" ]]; then
-    run_healthchecks
+        load_configs
 
-    initialize_airflow_database
+        initialize_airflow_database
 
-    # Start daemons
-    start_daemons
+        for daemon in ${AIRFLOW_DAEMONS[@]}; do
+            __retry_loop__ "airflow $daemon" \
+                           "Starting Airflow daemon \"$daemon\"..." \
+                           "Airflow daemon \"$daemon\" start failed!" \
+                           "Airflow daemon \"$daemon\" couldn't be started." \
+                           "Airflow daemon \"$daemon\" is ready." &
+        done
 
-    tail -f /dev/null
-  fi
+        tail -f /dev/null
+    fi
 }
 
 main

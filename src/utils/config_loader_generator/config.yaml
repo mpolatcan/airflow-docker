@@ -1,0 +1,39 @@
+config_loader_sh_template: |
+  #!/usr/bin/env bash
+
+  declare -A __SERVICE_PORTS__
+  declare -A __AUTHENTICATION_BACKENDS__
+
+  __SERVICE_PORTS__[postgresql]="5432"
+  __SERVICE_PORTS__[mysql]="3306"
+  __SERVICE_PORTS__[redis]="6379"
+  __SERVICE_PORTS__[rabbitmq]="5672"
+
+  __AUTHENTICATION_BACKENDS__[password]="airflow.contrib.auth.backends.password_auth"
+  __AUTHENTICATION_BACKENDS__[ldap]="airflow.contrib.auth.backends.ldap_auth"
+  __AUTHENTICATION_BACKENDS__[github_enterprise]="airflow.contrib.auth.backends.github_enterprise_auth"
+  __AUTHENTICATION_BACKENDS__[google]="airflow.contrib.auth.backends.google_auth"
+
+  function load_config() {{
+      if [[ "$2" != "NULL" ]]
+          then
+              printf "$1 = $2\n" >> "${{AIRFLOW_CONF_DIR}}/$3"
+      fi
+  }}
+
+  function load_config_with_opt() {{
+      if [[ "$2" != "NULL" ]]
+          then
+              printf "$1 = $3\n" >> "${{AIRFLOW_CONF_DIR}}/$5"
+      else
+          printf "$1 = $4\n" >> "${{AIRFLOW_CONF_DIR}}/$5"
+      fi
+  }}
+
+  {load_fn_calls}
+
+config_files:
+  - path: airflow_configs/airflow-cfg.yml
+    filename: airflow.cfg
+
+output_dir: ../../base

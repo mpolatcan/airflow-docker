@@ -30,16 +30,16 @@
     console:
       log: "True"
     log:
-      format: "[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s"
+      format: "[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {{%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d\\}\\} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s"
     formatter:
       class: "airflow.utils.log.colored_log.CustomTTYColoredFormatter"
   log:
-    format: "[%%%%(asctime)s] {%%%%(filename)s:%%%%(lineno)d} %%%%(levelname)s - %%%%(message)s"
+    format: "[%%%%(asctime)s] {{%%%%(filename)s:%%%%(lineno)d\\}\\} %%%%(levelname)s - %%%%(message)s"
     filename:
-      template: "{{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log"
+      template: "{{ ti.dag_id \\}\\}/{{ ti.task_id \\}\\}/{{ ts \\}\\}/{{ try_number \\}\\}.log"
     processor:
       filename:
-        template: "{{ filename }}.log"
+        template: "{{ filename \\}\\}.log"
   simple:
     log:
       format: "%%%%(asctime)s %%%%(levelname)s - %%%%(message)s"
@@ -70,9 +70,9 @@
   sql:
     alchemy:
       conn: >-
-        ?${AIRFLOW_DATABASE_PASSWORD},
-        ${AIRFLOW_DATABASE_TYPE}://${AIRFLOW_DATABASE_USER}:${AIRFLOW_DATABASE_PASSWORD}@${AIRFLOW_DATABASE_HOST}:${AIRFLOW_DATABASE_PORT}/airflow,
-        ${AIRFLOW_DATABASE_TYPE}://${AIRFLOW_DATABASE_HOST}:${AIRFLOW_DATABASE_PORT}/airflow
+        ?${AIRFLOW_DATABASE_PASSWORD:=NULL},
+        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_USER:=NULL}:${AIRFLOW_DATABASE_PASSWORD:=NULL}@${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/airflow,
+        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/airflow
       pool:
         enabled: "True"
         size: "5"
@@ -187,7 +187,7 @@
     config: "False"
   authenticate: "False"
   auth:
-    backend: "=${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE}]}"
+    backend: "=${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE:=password}]}"
   filter:
     by:
       owner: "False"
@@ -258,14 +258,14 @@
         port: "8793"
   broker:
     url: >-
-      ?${AIRFLOW_BROKER_PASSWORD},
-      ${AIRFLOW_BROKER_TYPE}://${AIRFLOW_BROKER_USER}:${AIRFLOW_BROKER_PASSWORD}@${AIRFLOW_BROKER_HOST}:${AIRFLOW_BROKER_PORT}/0,
-      ${AIRFLOW_BROKER_TYPE}://${AIRFLOW_BROKER_HOST}:${AIRFLOW_BROKER_PORT}/0
+      ?${AIRFLOW_BROKER_PASSWORD:=NULL},
+      ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_USER:=NULL}:${AIRFLOW_BROKER_PASSWORD:=NULL}@${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0,
+      ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0
   result:
     backend: >-
-      ?${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD},
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}://${AIRFLOW_BROKER_RESULT_BACKEND_USER}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT}/airflow,
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT}/airflow
+      ?${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL},
+      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_USER:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/airflow,
+      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/airflow
   flower:
     host: "0.0.0.0"
     url:
@@ -423,7 +423,7 @@
   host: "NULL"
   log:
     id:
-      template: "{dag_id}-{task_id}-{execution_date}-{try_number}"
+      template: "{dag_id\\}-{task_id\\}-{execution_date\\}-{try_number\\}"
   end:
     of:
       log:

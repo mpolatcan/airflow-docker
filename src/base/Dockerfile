@@ -7,248 +7,7 @@ MAINTAINER Mutlu Polatcan <mutlupolatcan@gmail.com>
 ENV AIRFLOW_USER_HOME="/home/airflow"
 ENV AIRFLOW_HOME="${AIRFLOW_USER_HOME}/airflow" \
     AIRFLOW_CONF_DIR="${AIRFLOW_USER_HOME}/airflow" \
-    AIRFLOW_VIRTUALENV="${AIRFLOW_USER_HOME}/airflow_venv" \
-    AIRFLOW_DAEMONS="NULL" \
-    AIRFLOW_DATABASE_TYPE="postgresql" \
-    AIRFLOW_DATABASE_HOST="NULL" \
-    AIRFLOW_DATABASE_PORT="NULL" \
-    AIRFLOW_DATABASE_USER="NULL" \
-    AIRFLOW_DATABASE_PASSWORD="NULL" \
-    AIRFLOW_BROKER_TYPE="redis" \
-    AIRFLOW_BROKER_HOST="NULL" \
-    AIRFLOW_BROKER_PORT="NULL" \
-    AIRFLOW_BROKER_USER="NULL" \
-    AIRFLOW_BROKER_PASSWORD="NULL" \
-    AIRFLOW_BROKER_RESULT_BACKEND_TYPE="postgresql" \
-    AIRFLOW_BROKER_RESULT_BACKEND_HOST="NULL" \
-    AIRFLOW_BROKER_RESULT_BACKEND_PORT="NULL" \
-    AIRFLOW_BROKER_RESULT_BACKEND_USER="NULL" \
-    AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD="NULL" \
-    AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE="NULL" \
-    AIRFLOW_RETRY_INTERVAL_IN_SECS="2" \
-    AIRFLOW_MAX_RETRY_TIMES="-1" \
-    AIRFLOW_INITIAL_USERS="NULL" \
-	CORE_DAGS_ARE_PAUSED_AT_CREATION="True" \
-	CORE_REMOTE_LOGGING="False" \
-	CORE_REMOTE_LOG_CONN_ID="NULL" \
-	CORE_REMOTE_BASE_LOG_FOLDER="NULL" \
-	CORE_ENCRYPT_S3_LOGS="False" \
-	CORE_LOGGING_LEVEL="INFO" \
-	CORE_LOGGING_CONFIG_CLASS="NULL" \
-	CORE_FAB_LOGGING_LEVEL="WARN" \
-	CORE_COLORED_CONSOLE_LOG="True" \
-	CORE_COLORED_LOG_FORMAT="[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s" \
-	CORE_COLORED_FORMATTER_CLASS="airflow.utils.log.colored_log.CustomTTYColoredFormatter" \
-	CORE_LOG_FORMAT="[%%%%(asctime)s] {%%%%(filename)s:%%%%(lineno)d} %%%%(levelname)s - %%%%(message)s" \
-	CORE_LOG_FILENAME_TEMPLATE="{{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log" \
-	CORE_LOG_PROCESSOR_FILENAME_TEMPLATE="{{ filename }}.log" \
-	CORE_SIMPLE_LOG_FORMAT="%%%%(asctime)s %%%%(levelname)s - %%%%(message)s" \
-	CORE_DAG_CONCURRENCY="16" \
-	CORE_DAG_FILE_PROCESSOR_TIMEOUT="50" \
-	CORE_DAG_RUN_CONF_OVERRIDES_PARAMS="False" \
-	CORE_DAG_DISCOVERY_SAFE_MODE="True" \
-	CORE_HOSTNAME_CALLABLE="socket:getfqdn" \
-	CORE_DEFAULT_TIMEZONE="utc" \
-	CORE_DEFAULT_IMPERSONATION="NULL" \
-	CORE_DEFAULT_TASK_RETRIES="0" \
-	CORE_EXECUTOR="SequentialExecutor" \
-	CORE_SQL_ALCHEMY_POOL_ENABLED="True" \
-	CORE_SQL_ALCHEMY_POOL_SIZE="5" \
-	CORE_SQL_ALCHEMY_POOL_RECYCLE="1800" \
-	CORE_SQL_ALCHEMY_POOL_PRE_PING="True" \
-	CORE_SQL_ALCHEMY_MAX_OVERFLOW="10" \
-	CORE_SQL_ALCHEMY_SCHEMA="NULL" \
-	CORE_SQL_ENGINE_ENCODING="utf-8" \
-	CORE_PARALLELISM="32" \
-	CORE_MAX_ACTIVE_RUNS_PER_DAG="16" \
-	CORE_LOAD_EXAMPLES="False" \
-	CORE_DONOT_PICKLE="False" \
-	CORE_DAGBAG_IMPORT_TIMEOUT="30" \
-	CORE_TASK_RUNNER="StandardTaskRunner" \
-	CORE_TASK_LOG_READER="task" \
-	CORE_SECURITY="NULL" \
-	CORE_SECURE_MODE="False" \
-	CORE_UNIT_TEST_MODE="False" \
-	CORE_ENABLE_XCOM_PICKLING="True" \
-	CORE_KILLED_TASK_CLEANUP_TIME="60" \
-	CORE_WORKER_PRECHECK="False" \
-	CLI_API_CLIENT="airflow.api.client.local_client" \
-	CLI_ENDPOINT_URL="http://localhost:8080" \
-	API_AUTH_BACKEND="airflow.api.auth.backend.default" \
-	LINEAGE_BACKEND="" \
-	ATLAS_SASL_ENABLED="False" \
-	ATLAS_HOST="NULL" \
-	ATLAS_PORT="21000" \
-	ATLAS_USERNAME="NULL" \
-	ATLAS_PASSWORD="NULL" \
-	OPERATORS_DEFAULT_OWNER="airflow" \
-	OPERATORS_DEFAULT_CPUS="1" \
-	OPERATORS_DEFAULT_RAM="512" \
-	OPERATORS_DEFAULT_DISK="612" \
-	OPERATORS_DEFAULT_GPUS="0" \
-	HIVE_DEFAULT_HIVE_MAPRED_QUEUE="NULL" \
-	WEBSERVER_BASE_URL="http://localhost:8080" \
-	WEBSERVER_WEB_SERVER_HOST="0.0.0.0" \
-	WEBSERVER_WEB_SERVER_PORT="8080" \
-	WEBSERVER_WEB_SERVER_SSL_CERT="NULL" \
-	WEBSERVER_WEB_SERVER_SSL_KEY="NULL" \
-	WEBSERVER_WEB_SERVER_MASTER_TIMEOUT="120" \
-	WEBSERVER_WEB_SERVER_WORKER_TIMEOUT="120" \
-	WEBSERVER_WORKER_REFRESH_BATCH_SIZE="1" \
-	WEBSERVER_WORKER_REFRESH_INTERVAL="30" \
-	WEBSERVER_WORKER_CLASS="sync" \
-	WEBSERVER_SECRET_KEY="temporary_key" \
-	WEBSERVER_WORKERS="4" \
-	WEBSERVER_ACCESS_LOGFILE="-" \
-	WEBSERVER_ERROR_LOGFILE="-" \
-	WEBSERVER_EXPOSE_CONFIG="False" \
-	WEBSERVER_AUTHENTICATE="False" \
-	WEBSERVER_FILTER_BY_OWNER="False" \
-	WEBSERVER_OWNER_MODE="user" \
-	WEBSERVER_DAG_DEFAULT_VIEW="tree" \
-	WEBSERVER_DAG_ORIENTATION="LR" \
-	WEBSERVER_DEMO_MODE="False" \
-	WEBSERVER_LOG_FETCH_TIMEOUT_SEC="5" \
-	WEBSERVER_HIDE_PAUSED_DAGS_BY_DEFAULT="False" \
-	WEBSERVER_PAGE_SIZE="100" \
-	WEBSERVER_RBAC="False" \
-	WEBSERVER_NAVBAR_COLOR="#007A87" \
-	WEBSERVER_DEFAULT_DAG_RUN_DISPLAY_NUMBER="25" \
-	WEBSERVER_DEFAULT_WRAP="False" \
-	WEBSERVER_ENABLE_PROXY_FIX="False" \
-	WEBSERVER_COOKIE_SECURE="False" \
-	WEBSERVER_COOKIE_SAMESITE="NULL" \
-	EMAIL_EMAIL_BACKEND="airflow.utils.email.send_email_smtp" \
-	SMTP_SMTP_HOST="localhost" \
-	SMTP_SMTP_STARTTLS="True" \
-	SMTP_SMTP_SSL="False" \
-	SMTP_SMTP_USER="airflow" \
-	SMTP_SMTP_PASSWORD="airflow" \
-	SMTP_SMTP_PORT="25" \
-	SMTP_SMTP_MAIL_FROM="airflow@example.com" \
-	SENTRY_SENTRY_DSN="NULL" \
-	CELERY_CELERY_APP_NAME="airflow.executors.celery_executor" \
-	CELERY_CELERY_CONFIG_OPTIONS="airflow.config_templates.default_celery.DEFAULT_CELERY_CONFIG" \
-	CELERY_WORKER_CONCURRENCY="16" \
-	CELERY_WORKER_LOG_SERVER_PORT="8793" \
-	CELERY_FLOWER_HOST="0.0.0.0" \
-	CELERY_FLOWER_URL_PREFIX="NULL" \
-	CELERY_FLOWER_PORT="5555" \
-	CELERY_FLOWER_BASIC_AUTH="NULL" \
-	CELERY_DEFAULT_QUEUE="default" \
-	CELERY_SYNC_PARALLELISM="0" \
-	CELERY_SSL_ACTIVE="False" \
-	CELERY_SSL_KEY="NULL" \
-	CELERY_SSL_CERT="NULL" \
-	CELERY_SSL_CACERT="NULL" \
-	CELERY_POOL="prefork" \
-	DASK_CLUSTER_ADDRESS="127.0.0.1:8766" \
-	DASK_TLS_CA="NULL" \
-	DASK_TLS_CERT="NULL" \
-	DASK_TLS_KEY="NULL" \
-	SCHEDULER_JOB_HEARTBEAT_SEC="5" \
-	SCHEDULER_SCHEDULER_HEARTBEAT_SEC="5" \
-	SCHEDULER_SCHEDULER_HEALTH_CHECK_THRESHOLD="30" \
-	SCHEDULER_SCHEDULER_ZOMBIE_TASK_THRESHOLD="300" \
-	SCHEDULER_RUN_DURATION="-1" \
-	SCHEDULER_NUM_RUNS="-1" \
-	SCHEDULER_PROCESSOR_POLL_INTERVAL="1" \
-	SCHEDULER_MIN_FILE_PROCESS_INTERVAL="0" \
-	SCHEDULER_DAG_DIR_LIST_INTERVAL="300" \
-	SCHEDULER_PRINT_STATS_INTERVAL="30" \
-	SCHEDULER_CATCHUP_BY_DEFAULT="True" \
-	SCHEDULER_MAX_TIS_PER_QUERY="512" \
-	SCHEDULER_MAX_THREADS="2" \
-	SCHEDULER_STATSD_ON="False" \
-	SCHEDULER_STATSD_HOST="localhost" \
-	SCHEDULER_STATSD_PORT="8125" \
-	SCHEDULER_STATSD_PREFIX="airflow" \
-	SCHEDULER_STATSD_ALLOW_LIST="NULL" \
-	SCHEDULER_AUTHENTICATE="False" \
-	SCHEDULER_USE_JOB_SCHEDULE="True" \
-	LDAP_URI="NULL" \
-	LDAP_USER_FILTER="objectClass=*" \
-	LDAP_USER_NAME_ATTR="uid" \
-	LDAP_GROUP_MEMBER_ATTR="memberOf" \
-	LDAP_SUPERUSER_FILTER="NULL" \
-	LDAP_DATA_PROFILER_FILTER="NULL" \
-	LDAP_BIND_USER="cn=Manager,dc=example,dc=com" \
-	LDAP_BIND_PASSWORD="insecure" \
-	LDAP_BASEDN="dc=example,dc=com" \
-	LDAP_CACERT="/etc/ca/ldap_ca.crt" \
-	LDAP_SEARCH_SCOPE="LEVEL" \
-	LDAP_IGNORE_MALFORMED_SCHEMA="False" \
-	MESOS_MASTER="localhost:5050" \
-	MESOS_FRAMEWORK_NAME="Airflow" \
-	MESOS_TASK_CPU="1" \
-	MESOS_TASK_MEMORY="256" \
-	MESOS_CHECKPOINT="False" \
-	MESOS_AUTHENTICATE="False" \
-	KERBEROS_CCACHE="/tmp/airflow_krb5_ccache" \
-	KERBEROS_PRINCIPAL="airflow" \
-	KERBEROS_REINIT_FREQUENCY="3600" \
-	KERBEROS_KINIT_PATH="kinit" \
-	KERBEROS_KEYTAB="airflow.keytab" \
-	GITHUB_ENTERPRISE_API_REV="v3" \
-	GITHUB_ENTERPRISE_HOST="NULL" \
-	GITHUB_ENTERPRISE_CLIENT_ID="NULL" \
-	GITHUB_ENTERPRISE_CLIENT_SECRET="NULL" \
-	GITHUB_ENTERPRISE_OAUTH_CALLBACK_ROUTE="NULL" \
-	GITHUB_ENTERPRISE_ALLOWED_TEAMS="NULL" \
-	GOOGLE_CLIENT_ID="NULL" \
-	GOOGLE_CLIENT_SECRET="NULL" \
-	GOOGLE_OAUTH_CALLBACK_ROUTE="NULL" \
-	GOOGLE_DOMAIN="NULL" \
-	ADMIN_HIDE_SENSITIVE_VARIABLE_FIELDS="True" \
-	ELASTICSEARCH_HOST="NULL" \
-	ELASTICSEARCH_LOG_ID_TEMPLATE="{dag_id}-{task_id}-{execution_date}-{try_number}" \
-	ELASTICSEARCH_END_OF_LOG_MARK="end_of_log" \
-	ELASTICSEARCH_FRONTEND="NULL" \
-	ELASTICSEARCH_WRITE_STDOUT="False" \
-	ELASTICSEARCH_JSON_FORMAT="False" \
-	ELASTICSEARCH_JSON_FIELDS="asctime, filename, lineno, levelname, message" \
-	ELASTICSEARCH_CONFIGS_USE_SSL="False" \
-	ELASTICSEARCH_CONFIGS_VERIFY_CERTS="True" \
-	KUBERNETES_WORKER_CONTAINER_REPOSITORY="NULL" \
-	KUBERNETES_WORKER_CONTAINER_TAG="NULL" \
-	KUBERNETES_WORKER_CONTAINER_IMAGE_PULL_POLICY="IfNotPresent" \
-	KUBERNETES_WORKER_PODS_CREATION_BATCH_SIZE="1" \
-	KUBERNETES_WORKER_SERVICE_ACCOUNT_NAME="NULL" \
-	KUBERNETES_DELETE_WORKER_PODS="True" \
-	KUBERNETES_NAMESPACE="default" \
-	KUBERNETES_AIRFLOW_CONFIGMAP="NULL" \
-	KUBERNETES_DAGS_IN_IMAGE="False" \
-	KUBERNETES_DAGS_VOLUME_SUBPATH="NULL" \
-	KUBERNETES_DAGS_VOLUME_CLAIM="NULL" \
-	KUBERNETES_DAGS_VOLUME_HOST="NULL" \
-	KUBERNETES_LOGS_VOLUME_SUBPATH="NULL" \
-	KUBERNETES_LOGS_VOLUME_CLAIM="NULL" \
-	KUBERNETES_LOGS_VOLUME_HOST="NULL" \
-	KUBERNETES_ENV_FROM_CONFIGMAP_REF="NULL" \
-	KUBERNETES_ENV_FROM_SECRET_REF="NULL" \
-	KUBERNETES_GIT_REPO="NULL" \
-	KUBERNETES_GIT_BRANCH="NULL" \
-	KUBERNETES_GIT_SUBPATH="NULL" \
-	KUBERNETES_GIT_USER="NULL" \
-	KUBERNETES_GIT_PASSWORD="NULL" \
-	KUBERNETES_GIT_SYNC_ROOT="/git" \
-	KUBERNETES_GIT_SYNC_DEST="repo" \
-	KUBERNETES_GIT_SYNC_CREDENTIALS_SECRET="NULL" \
-	KUBERNETES_GIT_SYNC_CONTAINER_REPOSITORY="k8s.gcr.io/git-sync" \
-	KUBERNETES_GIT_SYNC_CONTAINER_TAG="v3.1.1" \
-	KUBERNETES_GIT_SYNC_INIT_CONTAINER_NAME="git-sync-clone" \
-	KUBERNETES_GIT_SYNC_RUN_AS_USER="65535" \
-	KUBERNETES_GIT_DAGS_FOLDER_MOUNT_POINT="NULL" \
-	KUBERNETES_GIT_SSH_KEY_SECRET_NAME="NULL" \
-	KUBERNETES_GIT_SSH_KNOWN_HOSTS_CONFIGMAP_NAME="NULL" \
-	KUBERNETES_IMAGE_PULL_SECRETS="NULL" \
-	KUBERNETES_GCP_SERVICE_ACCOUNT_KEYS="NULL" \
-	KUBERNETES_IN_CLUSTER="True" \
-	KUBERNETES_AFFINITY="NULL" \
-	KUBERNETES_TOLERATIONS="NULL" \
-	KUBERNETES_KUBE_CLIENT_REQUEST_ARGS="{\"_request_timeout\" : [60,60] }" \
-	KUBERNETES_RUN_AS_USER="NULL" \
-	KUBERNETES_FS_GROUP="NULL"
+    AIRFLOW_VIRTUALENV="${AIRFLOW_USER_HOME}/airflow_venv"
 ENV PATH=${AIRFLOW_VIRTUALENV}/bin:$PATH
 
 ADD entrypoint.sh ${AIRFLOW_USER_HOME}/airflow_entrypoint.sh
@@ -258,22 +17,22 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
     echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list && \
     apt-get update && \
     apt-get -y install --no-install-recommends nano \
-                                               gcc \
-                                               g++ \
-                                               iputils-ping \
-                                               dnsutils \
-                                               telnet \
-                                               netcat \
-                                               default-libmysqlclient-dev \
-                                               libkrb5-dev \
-                                               libsasl2-dev \
-                                               apt-transport-https \
-                                               kubectl && \
+                                                 gcc \
+                                                 g++ \
+                                                 iputils-ping \
+                                                 dnsutils \
+                                                 telnet \
+                                                 netcat \
+                                                 default-libmysqlclient-dev \
+                                                 libkrb5-dev \
+                                                 libsasl2-dev \
+                                                 apt-transport-https \
+                                                 kubectl && \
     rm -rf /var/lib/apt/lists/* && \
     addgroup airflow && adduser --disabled-password --gecos "" --ingroup airflow airflow && \
     mkdir -p ${AIRFLOW_USER_HOME} && \
     mkdir -p ${AIRFLOW_HOME} ${AIRFLOW_VIRTUALENV} && \
-    pip3 install virtualenv && \
+    pip3 install virtualenv psycopg2-binary && \
     virtualenv -p python3 ${AIRFLOW_VIRTUALENV} && \
-    ${AIRFLOW_VIRTUALENV}/bin/pip3 install "pymssql<3.0" statsd psycopg2-binary && \
+    ${AIRFLOW_VIRTUALENV}/bin/pip3 install "pymssql<3.0" statsd && \
     chmod +x ${AIRFLOW_USER_HOME}/airflow_entrypoint.sh ${AIRFLOW_USER_HOME}/airflow_config_loader.sh

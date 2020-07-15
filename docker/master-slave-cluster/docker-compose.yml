@@ -4,7 +4,7 @@
 version: "3.7"
 services:
   airflow-master:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     container_name: airflow-master
     environment:
       AIRFLOW_DAEMONS: |
@@ -20,7 +20,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
-    image: mpolatcan/airflow:1.10.6-python3.6
+    image: mpolatcan/airflow:1.10.11-python3.7
     environment:
       AIRFLOW_DAEMONS: |
         worker
