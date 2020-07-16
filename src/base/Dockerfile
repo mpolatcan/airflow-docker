@@ -1,6 +1,6 @@
-ARG PYTHON_VERSION=""
+ARG AIRFLOW_PYTHON_VERSION=""
 
-FROM python:${PYTHON_VERSION}
+FROM python:${AIRFLOW_PYTHON_VERSION}
 
 MAINTAINER Mutlu Polatcan <mutlupolatcan@gmail.com>
 
