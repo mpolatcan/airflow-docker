@@ -4,6 +4,7 @@ FROM mpolatcan/airflow:base-python${PYTHON_VERSION}
 
 MAINTAINER Mutlu Polatcan <mutlupolatcan@gmail.com>
 
+ARG PYTHON_VERSION=""
 ARG AIRFLOW_VERSION=""
 
 RUN ${AIRFLOW_VIRTUALENV}/bin/pip3 install apache-airflow[all]==${AIRFLOW_VERSION} --constraint https://raw.githubusercontent.com/apache/airflow/${AIRFLOW_VERSION}/requirements/requirements-python${PYTHON_VERSION}.txt && \
