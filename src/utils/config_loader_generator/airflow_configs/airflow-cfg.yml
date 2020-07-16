@@ -95,7 +95,7 @@
   plugins:
     folder: "=${AIRFLOW_HOME}/plugins"
   fernet:
-    key: "=$(python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\")"
+    key: "3D5RJ24-Z3ybh91tdRlGMzbH-mk0vBnuV4W3yC1Rvvc="
   donot:
     pickle: "False"
   dagbag:
