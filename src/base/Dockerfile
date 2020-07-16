@@ -27,19 +27,7 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
                                                libkrb5-dev \
                                                libsasl2-dev \
                                                apt-transport-https \
-                                               kubectl \
-                                               freetds-bin \
-                                               krb5-user \
-                                               ldap-utils \
-                                               libffi6 \
-                                               libsasl2-2 \
-                                               libsasl2-modules \
-                                               libssl1.1 \
-                                               locales  \
-                                               lsb-release \
-                                               sasl2-bin \
-                                               sqlite3 \
-                                               unixodbc && \
+                                               kubectl && \
     rm -rf /var/lib/apt/lists/* && \
     addgroup airflow && adduser --disabled-password --gecos "" --ingroup airflow airflow && \
     mkdir -p ${AIRFLOW_USER_HOME} && \
