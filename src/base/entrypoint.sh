@@ -59,7 +59,7 @@ function health_checker() {
         __log__ "Airflow $1 host is not defined. Exiting ✘..."
         exit 1
     else
-        __log__ "Superset $1 host is $3. OK ✔"
+        __log__ "Airflow $1 host is $3. OK ✔"
     fi
 
     __retry_loop__ "nc -z $3 $4" \

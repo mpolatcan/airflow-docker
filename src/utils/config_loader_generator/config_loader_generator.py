@@ -35,7 +35,7 @@ class ConfigLoaderGenerator:
                             if property_prefix and not Constants.CONFIGURATION_SECTION_KEY_REGEX.match(property_prefix) \
                             else property
             env_var_name = env_var_name.upper().replace("<", "").replace(">", "").replace("-", "_")
-            property_name = property_name[:-1] if property_name[-1] == "." else property_name
+            property_name = property_name[:-1] if property_name[-1] == "_" else property_name
 
             if Constants.CONFIGURATION_SECTION_KEY_REGEX.match(property_name):
                 load_fn_calls.append(

@@ -71,8 +71,8 @@
     alchemy:
       conn: >-
         ?${AIRFLOW_DATABASE_PASSWORD:=NULL},
-        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_USER:=NULL}:${AIRFLOW_DATABASE_PASSWORD:=NULL}@${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/airflow,
-        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/airflow
+        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_USER:=NULL}:${AIRFLOW_DATABASE_PASSWORD:=NULL}@${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/${AIRFLOW_DATABASE_NAME:=NULL},
+        ${AIRFLOW_DATABASE_TYPE:=postgresql}://${AIRFLOW_DATABASE_HOST:=NULL}:${AIRFLOW_DATABASE_PORT:=${__SERVICE_PORTS__[${AIRFLOW_DATABASE_TYPE:=postgresql}]}}/${AIRFLOW_DATABASE_NAME:=NULL}
       pool:
         enabled: "True"
         size: "5"
@@ -90,6 +90,12 @@
       runs:
         per:
           dag: "16"
+    num:
+      rendered:
+        ti:
+          fields:
+            per:
+              task: "30"
   load:
     examples: "False"
   plugins:
@@ -120,6 +126,18 @@
         time: "60"
   worker:
     precheck: "False"
+  store:
+    serialized:
+      dags: "False"
+    dag:
+      code: "NULL"
+  min:
+    serialized:
+      dag:
+        update:
+          interval: "30"
+  check:
+    slas: "True"
 
 <cli>:
   api:
@@ -132,7 +150,7 @@
     backend: "airflow.api.auth.backend.default"
 
 <lineage>:
-  backend: ""
+  backend: "NULL"
 
 <atlas>:
   sasl:
@@ -185,6 +203,7 @@
     logfile: "-"
   expose:
     config: "False"
+    stacktrace: "True"
   authenticate: "False"
   auth:
     backend: "=${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE:=password}]}"
@@ -203,6 +222,13 @@
     fetch:
       timeout:
         sec: "5"
+      delay:
+        sec: "2"
+    auto:
+      tailing:
+        offset: "30"
+    animation:
+      speed: "1000"
   hide:
     paused:
       dags:
@@ -219,12 +245,42 @@
         display:
           number: "25"
     wrap: "False"
+    ui:
+      timezone: "UTC"
   enable:
     proxy:
       fix: "False"
   cookie:
     secure: "False"
     samesite: "NULL"
+  reload:
+    "on":
+      plugin:
+        change: "False"
+  proxy:
+    fix:
+      x:
+        for: "1"
+        proto: "1"
+        host: "1"
+        port: "1"
+        prefix: "1"
+  x:
+    frame:
+      enabled: "True"
+  analytics:
+    tool: "NULL"
+    id: "NULL"
+  update:
+    fab:
+      perms: "True"
+  force:
+    log:
+      out:
+        after: "0"
+  session:
+    lifetime:
+      days: "30"
 
 <email>:
   email:
@@ -256,6 +312,7 @@
     log:
       server:
         port: "8793"
+    autoscale: "NULL"
   broker:
     url: >-
       ?${AIRFLOW_BROKER_PASSWORD:=NULL},
@@ -264,8 +321,8 @@
   result:
     backend: >-
       ?${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL},
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_USER:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/airflow,
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/airflow
+      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_USER:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL},
+      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL}
   flower:
     host: "0.0.0.0"
     url:
@@ -283,6 +340,8 @@
     cert: "NULL"
     cacert: "NULL"
   pool: "prefork"
+  operation:
+    timeout: "2"
 
 <dask>:
   cluster:
@@ -346,6 +405,10 @@
   use:
     job:
       schedule: "True"
+  allow:
+    trigger:
+      in:
+        future: "False"
 
 <ldap>:
   uri: "NULL"
@@ -381,6 +444,14 @@
     memory: "256"
   checkpoint: "False"
   authenticate: "False"
+  failover:
+    timeout: "NULL"
+  default:
+    principal: "NULL"
+    secret: "NULL"
+  docker:
+    image:
+      slave: "NULL"
 
 <kerberos>:
   ccache: "/tmp/airflow_krb5_ccache"
@@ -532,3 +603,8 @@
       user: "NULL"
   fs:
     group: "NULL"
+
+<secrets>:
+  backend:
+    "": ""
+    kwargs: ""
