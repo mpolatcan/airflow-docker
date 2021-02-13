@@ -4,7 +4,7 @@
 version: "3.7"
 services:
   airflow-master:
-    image: mpolatcan/airflow:1.10.11-python3.7
+    image: mpolatcan/airflow:2.0.1-python3.8
     container_name: airflow-master
     environment:
       AIRFLOW_DAEMONS: |
@@ -20,7 +20,7 @@ services:
       - ./dags:/home/airflow/airflow/dags
 
   airflow-worker:
-    image: mpolatcan/airflow:1.10.11-python3.7
+    image: mpolatcan/airflow:2.0.1-python3.8
     environment:
       AIRFLOW_DAEMONS: |
         worker
@@ -36,6 +36,7 @@ services:
     environment:
       POSTGRES_USER: "airflow"
       POSTGRES_PASSWORD: "airflow"
+      POSTGRES_DB: "airflow"
 
   redis:
     image: redis

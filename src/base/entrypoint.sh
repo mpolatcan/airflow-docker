@@ -108,7 +108,7 @@ function password_auth_create_initial_users() {
 
         __log__ "Creating user \"${user_infos[0]}\" on Airflow database..."
 
-        airflow create_user --username ${user_infos[0]} \
+        airflow users create --username ${user_infos[0]} \
                             --password ${user_infos[1]} \
                             --email ${user_infos[2]} \
                             --firstname ${user_infos[3]} \
@@ -120,7 +120,7 @@ function password_auth_create_initial_users() {
 function initialize_airflow_database() {
     __log__ "Initializing Airflow database..."
 
-    airflow initdb
+    airflow db init
 
     if [[ "${WEBSERVER_AUTHENTICATE:=False}" == "True" && \
           "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE:=NULL}" == "${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE_PASSWORD}" && \
@@ -140,6 +140,10 @@ function main() {
         initialize_airflow_database
 
         for daemon in ${AIRFLOW_DAEMONS[@]}; do
+            if [[ "$daemon" == "worker" || "$daemon" == "flower" ]]; then
+                daemon="celery $daemon"
+            fi
+
             __retry_loop__ "airflow $daemon" \
                            "Starting Airflow daemon \"$daemon\"..." \
                            "Airflow daemon \"$daemon\" start failed!" \
