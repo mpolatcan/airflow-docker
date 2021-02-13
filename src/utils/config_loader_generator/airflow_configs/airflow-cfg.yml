@@ -1,71 +1,18 @@
 <core>:
   dags:
     folder: "=${AIRFLOW_HOME}/dags"
-    are:
-      paused:
-        at:
-          creation: "True"
-  base:
-    log:
-      folder: "=${AIRFLOW_HOME}/logs"
-  remote:
-    logging: "False"
-    log:
-      conn:
-        id: "NULL"
-    base:
-      log:
-        folder: "NULL"
-  encrypt:
-    s3:
-      logs: "False"
-  logging:
-    level: "INFO"
-    config:
-      class: "NULL"
-  fab:
-    logging:
-      level: "WARN"
-  colored:
-    console:
-      log: "True"
-    log:
-      format: "[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {{%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d\\}\\} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s"
-    formatter:
-      class: "airflow.utils.log.colored_log.CustomTTYColoredFormatter"
-  log:
-    format: "[%%%%(asctime)s] {{%%%%(filename)s:%%%%(lineno)d\\}\\} %%%%(levelname)s - %%%%(message)s"
-    filename:
-      template: "{{ ti.dag_id \\}\\}/{{ ti.task_id \\}\\}/{{ ts \\}\\}/{{ try_number \\}\\}.log"
-    processor:
-      filename:
-        template: "{{ filename \\}\\}.log"
-  simple:
-    log:
-      format: "%%%%(asctime)s %%%%(levelname)s - %%%%(message)s"
+    are_paused_at_creation: "True"
+  simple_log_format: "%%%%(asctime)s %%%%(levelname)s - %%%%(message)s"
   dag:
-    processor:
-      manager:
-        log:
-          location: "=${AIRFLOW_HOME}/logs/dag_processor_manager/dag_processor_manager.log"
     concurrency: "16"
-    file:
-      processor:
-        timeout: "50"
-    run:
-      conf:
-        overrides:
-          params: "False"
-    discovery:
-      safe:
-        mode: "True"
-  hostname:
-    callable: "socket:getfqdn"
+    file_processor_timeout: "50"
+    run_conf_overrides_params: "True"
+    discovery_safe_mode: "True"
+  hostname_callable: "socket.getfqdn"
   default:
     timezone: "utc"
     impersonation: "NULL"
-    task:
-      retries: "0"
+    task_retries: "0"
   executor: "SequentialExecutor"
   sql:
     alchemy:
@@ -77,84 +24,64 @@
         enabled: "True"
         size: "5"
         recycle: "1800"
-        pre:
-          ping: "True"
-      max:
-        overflow: "10"
+        pre_ping: "True"
+      max_overflow: "10"
       schema: "NULL"
+      connect_args: "NULL"
     engine:
       encoding: "utf-8"
+      collation_for_ids: "NULL"
   parallelism: "32"
   max:
-    active:
-      runs:
-        per:
-          dag: "16"
-    num:
-      rendered:
-        ti:
-          fields:
-            per:
-              task: "30"
+    active_runs_per_dag: "16"
+    num_rendered_ti_fields_per_task: "30"
+    db_retries: "3"
   load:
     examples: "False"
-  plugins:
-    folder: "=${AIRFLOW_HOME}/plugins"
-  fernet:
-    key: "3D5RJ24-Z3ybh91tdRlGMzbH-mk0vBnuV4W3yC1Rvvc="
-  donot:
-    pickle: "False"
-  dagbag:
-    import:
-      timeout: "30"
-  task:
-    runner: "StandardTaskRunner"
-    log:
-      reader: "task"
+    default_connections: "False"
+  plugins_folder: "=${AIRFLOW_HOME}/plugins"
+  fernet_key: "3D5RJ24-Z3ybh91tdRlGMzbH-mk0vBnuV4W3yC1Rvvc="
+  donot_pickle: "False"
+  dagbag_import:
+    timeout: "30"
+    error:
+      tracebacks: "True"
+      traceback_depth: "2"
+  task_runner: "StandardTaskRunner"
   security: "NULL"
-  secure:
-    mode: "False"
-  unit:
-    test:
-      mode: "False"
-  enable:
-    xcom:
-      pickling: "True"
-  killed:
-    task:
-      cleanup:
-        time: "60"
-  worker:
-    precheck: "False"
-  store:
-    serialized:
-      dags: "False"
-    dag:
-      code: "NULL"
-  min:
-    serialized:
-      dag:
-        update:
-          interval: "30"
-  check:
-    slas: "True"
+  secure_mode: "False"
+  unit_test_mode: "False"
+  enable_xcom_pickling: "True"
+  killed_task_cleanup_time: "60"
+  store_dag_code: "NULL"
+  min_serialized_dag:
+    update_interval: "30"
+    fetch_interval: "10"
+  check_slas: "True"
+  execute_tasks_new_python_interpreter: "False"
+  xcom_backend: "airflow.models.xcom.BaseXCom"
+  lazy:
+    load_plugins: "True"
+    discover_providers: "True"
 
 <cli>:
-  api:
-    client: "airflow.api.client.local_client"
-  endpoint:
-    url: "http://localhost:8080"
+  api_client: "airflow.api.client.local_client"
+  endpoint_url: "http://localhost:8080"
 
 <api>:
-  auth:
-    backend: "airflow.api.auth.backend.default"
+  enable_experimental_api: "False"
+  auth_backend: "airflow.api.auth.backend.default"
+  maximum_page_limit: "100"
+  fallback_page_limit: "100"
+  google:
+    oauth2_audience: "NULL"
+    key_path: "NULL"
 
 <lineage>:
   backend: "NULL"
 
 <atlas>:
-  sasl:
-    enabled: "False"
+  sasl_enabled: "False"
   host: "NULL"
   port: "21000"
   username: "NULL"
@@ -167,124 +94,80 @@
     ram: "512"
     disk: "612"
     gpus: "0"
+    allow_illegal_arguments: "False"
 
 <hive>:
-  default:
-    hive:
-      mapred:
-        queue: "NULL"
+  default_hive_mapred_queue: "NULL"
+  mapred_job_name_template: "NULL"
 
 <webserver>:
-  base:
-    url: "http://localhost:8080"
-  web:
-    server:
-      host: "0.0.0.0"
-      port: "8080"
-      ssl:
-        cert: "NULL"
-        key: "NULL"
-      master:
-        timeout: "120"
-      worker:
-        timeout: "120"
+  base_url: "http://localhost:8080"
+  web_server:
+    host: "0.0.0.0"
+    port: "8080"
+    ssl:
+      cert: "NULL"
+      key: "NULL"
+    master_timeout: "120"
+    worker_timeout: "120"
   worker:
     refresh:
-      batch:
-        size: "1"
+      batch_size: "1"
       interval: "30"
     class: "sync"
-  secret:
-    key: "temporary_key"
+  secret_key: "temporary_key"
   workers: "4"
-  access:
-    logfile: "-"
-  error:
-    logfile: "-"
+  access_logfile: "-"
+  error_logfile: "-"
   expose:
     config: "False"
+    hostname: "True"
     stacktrace: "True"
   authenticate: "False"
-  auth:
-    backend: "=${__AUTHENTICATION_BACKENDS__[${AIRFLOW_WEBSERVER_AUTH_BACKEND_TYPE:=password}]}"
-  filter:
-    by:
-      owner: "False"
-  owner:
-    mode: "user"
   dag:
-    default:
-      view: "tree"
+    default_view: "tree"
     orientation: "LR"
-  demo:
-    mode: "False"
+  demo_mode: "False"
   log:
     fetch:
-      timeout:
-        sec: "5"
-      delay:
-        sec: "2"
-    auto:
-      tailing:
-        offset: "30"
-    animation:
-      speed: "1000"
-  hide:
-    paused:
-      dags:
-        by:
-          default: "False"
-  page:
-    size: "100"
+      timeout_sec: "5"
+      delay_sec: "2"
+    auto_tailing_offset: "30"
+    animation_speed: "1000"
+  hide_paused_dags_by_default: "False"
+  page_size: "100"
   rbac: "False"
-  navbar:
-    color: "#007A87"
+  navbar_color: "#007A87"
   default:
-    dag:
-      run:
-        display:
-          number: "25"
+    dag_run_display_number: "25"
     wrap: "False"
-    ui:
-      timezone: "UTC"
-  enable:
-    proxy:
-      fix: "False"
+    ui_timezone: "UTC"
+  enable_proxy_fix: "False"
   cookie:
     secure: "False"
     samesite: "NULL"
-  reload:
-    "on":
-      plugin:
-        change: "False"
-  proxy:
-    fix:
-      x:
-        for: "1"
-        proto: "1"
-        host: "1"
-        port: "1"
-        prefix: "1"
-  x:
-    frame:
-      enabled: "True"
+  reload_on_plugin_change: "False"
+  proxy_fix_x:
+    for: "1"
+    proto: "1"
+    host: "1"
+    port: "1"
+    prefix: "1"
+  x_frame_enabled: "True"
   analytics:
     tool: "NULL"
     id: "NULL"
-  update:
-    fab:
-      perms: "True"
-  force:
-    log:
-      out:
-        after: "0"
-  session:
-    lifetime:
-      days: "30"
+  update_fab_perms: "True"
+  session_lifetime_minutes: "43200"
 
 <email>:
   email:
     backend: "airflow.utils.email.send_email_smtp"
+  default_email_on:
+    retry: "True"
+    failure: "True"
+  subject_template: "NULL"
+  html_content_template: "NULL"
 
 <smtp>:
   smtp:
@@ -294,317 +177,185 @@
     user: "airflow"
     password: "airflow"
     port: "25"
-    mail:
-      from: "airflow@example.com"
+    mail_from: "airflow@example.com"
+    timeout: "30"
+    retry_limit: "5"
 
 <sentry>:
   sentry:
+    "on": "false"
     dsn: "NULL"
 
 <celery>:
   celery:
-    app:
-      name: "airflow.executors.celery_executor"
-    config:
-      options: "airflow.config_templates.default_celery.DEFAULT_CELERY_CONFIG"
+    app_name: "airflow.executors.celery_executor"
+    config_options: "airflow.config_templates.default_celery.DEFAULT_CELERY_CONFIG"
   worker:
     concurrency: "16"
-    log:
-      server:
-        port: "8793"
     autoscale: "NULL"
-  broker:
-    url: >-
-      ?${AIRFLOW_BROKER_PASSWORD:=NULL},
-      ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_USER:=NULL}:${AIRFLOW_BROKER_PASSWORD:=NULL}@${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0,
-      ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0
-  result:
-    backend: >-
-      ?${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL},
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_USER:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL},
-      db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL}
+    prefetch_multiplier: "NULL"
+    log_server_port: "8793"
+    umask: "0o077"
+    precheck: "False"
+  broker_url: >-
+    ?${AIRFLOW_BROKER_PASSWORD:=NULL},
+    ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_USER:=NULL}:${AIRFLOW_BROKER_PASSWORD:=NULL}@${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0,
+    ${AIRFLOW_BROKER_TYPE:=redis}://${AIRFLOW_BROKER_HOST:=NULL}:${AIRFLOW_BROKER_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_TYPE:=redis}]}}/0
+  result_backend: >-
+    ?${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL},
+    db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_USER:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PASSWORD:=NULL}@${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL},
+    db+${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}://${AIRFLOW_BROKER_RESULT_BACKEND_HOST:=NULL}:${AIRFLOW_BROKER_RESULT_BACKEND_PORT:=${__SERVICE_PORTS__[${AIRFLOW_BROKER_RESULT_BACKEND_TYPE:=postgresql}]}}/${AIRFLOW_BROKER_RESULT_BACKEND_DATABASE_NAME:=NULL}
   flower:
     host: "0.0.0.0"
-    url:
-      prefix: "NULL"
+    url_prefix: "NULL"
     port: "5555"
-    basic:
-      auth: "NULL"
-  default:
-    queue: "default"
-  sync:
-    parallelism: "0"
+    basic_auth: "NULL"
+  default_queue: "default"
+  sync_parallelism: "0"
   ssl:
     active: "False"
     key: "NULL"
     cert: "NULL"
     cacert: "NULL"
   pool: "prefork"
-  operation:
-    timeout: "2"
+  operation_timeout: "1.0"
+  task:
+    track_started: "True"
+    adoption_timeout: "600"
+    publish_max_retries: "3"
 
 <dask>:
-  cluster:
-    address: "127.0.0.1:8766"
+  cluster_address: "127.0.0.1:8766"
   tls:
     ca: "NULL"
     cert: "NULL"
     key: "NULL"
 
 <scheduler>:
-  job:
-    heartbeat:
-      sec: "5"
+  job_heartbeat_sec: "5"
   scheduler:
-    heartbeat:
-      sec: "5"
-    health:
-      check:
-        threshold: "30"
-    zombie:
-      task:
-        threshold: "300"
-  run:
-    duration: "-1"
-  num:
-    runs: "-1"
-  processor:
-    poll:
-      interval: "1"
-  min:
-    file:
-      process:
-        interval: "0"
-  dag:
-    dir:
-      list:
-        interval: "300"
-  print:
-    stats:
-      interval: "30"
-  child:
-    process:
-      log:
-        directory: "=${AIRFLOW_HOME}/logs/scheduler"
-  catchup:
-    by:
-      default: "True"
+    heartbeat_sec: "5"
+    health_check_threshold: "30"
+    zombie_task_threshold: "300"
+  num_runs: "-1"
+  processor_poll_interval: "1"
+  min_file_process_interval: "30"
+  dag_dir_list_interval: "300"
+  print_stats_interval: "30"
+  child_process_log_directory: "=${AIRFLOW_HOME}/logs/scheduler"
+  catchup_by_default: "True"
   max:
-    tis:
-      per:
-        query: "512"
-    threads: "2"
-  statsd:
-    "on": "False"
-    host: "localhost"
-    port: "8125"
-    prefix: "airflow"
-    allow:
-      list: "NULL"
+    tis_per_query: "512"
+    dagruns:
+      to_create_per_loop: "NULL"
+      peer_loop_to_schedule: "NULL"
   authenticate: "False"
-  use:
-    job:
-      schedule: "True"
-  allow:
-    trigger:
-      in:
-        future: "False"
-
-<ldap>:
-  uri: "NULL"
-  user:
-    filter: "objectClass=*"
-    name:
-      attr: "uid"
-  group:
-    member:
-      attr: "memberOf"
-  superuser:
-    filter: "NULL"
-  data:
-    profiler:
-      filter: "NULL"
-  bind:
-    user: "cn=Manager,dc=example,dc=com"
-    password: "insecure"
-  basedn: "dc=example,dc=com"
-  cacert: "/etc/ca/ldap_ca.crt"
-  search:
-    scope: "LEVEL"
-  ignore:
-    malformed:
-      schema: "False"
-
-<mesos>:
-  master: "localhost:5050"
-  framework:
-    name: "Airflow"
-  task:
-    cpu: "1"
-    memory: "256"
-  checkpoint: "False"
-  authenticate: "False"
-  failover:
-    timeout: "NULL"
-  default:
-    principal: "NULL"
-    secret: "NULL"
-  docker:
-    image:
-      slave: "NULL"
+  use_job_schedule: "True"
+  allow_trigger_in_future: "False"
+  pool_metrics_interval: "5.0"
+  orphaned_tasks_check_interval: "300.0"
+  use_row_level_locking: "True"
+  schedule_after_task_execution: "NULL"
+  parsing_processes: "2"
 
 <kerberos>:
   ccache: "/tmp/airflow_krb5_ccache"
   principal: "airflow"
-  reinit:
-    frequency: "3600"
-  kinit:
-    path: "kinit"
+  reinit_frequency: "3600"
+  kinit_path: "kinit"
   keytab: "airflow.keytab"
 
 <github_enterprise>:
-  api:
-    rev: "v3"
-  host: "NULL"
-  client:
-    id: "NULL"
-    secret: "NULL"
-  oauth:
-    callback:
-      route: "NULL"
-  allowed:
-    teams: "NULL"
-
-<google>:
-  client:
-    id: "NULL"
-    secret: "NULL"
-  oauth:
-    callback:
-      route: "NULL"
-  domain: "NULL"
+  api_rev: "v3"
 
 <admin>:
-  hide:
-    sensitive:
-      variable:
-        fields: "True"
+  hide_sensitive_variable_fields: "True"
+  sensitive_variable_fields: "NULL"
 
 <elasticsearch>:
   host: "NULL"
-  log:
-    id:
-      template: "{dag_id\\}-{task_id\\}-{execution_date\\}-{try_number\\}"
-  end:
-    of:
-      log:
-        mark: "end_of_log"
+  log_id_template: "{dag_id\\}-{task_id\\}-{execution_date\\}-{try_number\\}"
+  end_of_log_mark: "end_of_log"
   frontend: "NULL"
-  write:
-    stdout: "False"
+  write_stdout: "False"
   json:
     format: "False"
     fields: "asctime, filename, lineno, levelname, message"
 
 <elasticsearch_configs>:
-  use:
-    ssl: "False"
-  verify:
-    certs: "True"
+  use_ssl: "False"
+  verify_certs: "True"
 
 <kubernetes>:
+  pod_template_file: "NULL"
   worker:
     container:
       repository: "NULL"
       tag: "NULL"
-      image:
-        pull:
-          policy: "IfNotPresent"
-    pods:
-      creation:
-        batch:
-          size: "1"
-    service:
-      account:
-        name: "NULL"
-  delete:
-    worker:
-      pods: "True"
+    pods_creation_batch_size: "1"
   namespace: "default"
-  airflow:
-    configmap: "NULL"
-  dags:
-    in:
-      image: "False"
-    volume:
-      subpath: "NULL"
-      claim: "NULL"
-      host: "NULL"
-  logs:
-    volume:
-      subpath: "NULL"
-      claim: "NULL"
-      host: "NULL"
-  env:
-    from:
-      configmap:
-        ref: "NULL"
-      secret:
-        ref: "NULL"
-  git:
-    repo: "NULL"
-    branch: "NULL"
-    subpath: "NULL"
-    user: "NULL"
-    password: "NULL"
-    sync:
-      root: "/git"
-      dest: "repo"
-      credentials:
-        secret: "NULL"
-      container:
-        repository: "k8s.gcr.io/git-sync"
-        tag: "v3.1.1"
-      init:
-        container:
-          name: "git-sync-clone"
-      run:
-        as:
-          user: "65535"
-    dags:
-      folder:
-        mount:
-          point: "NULL"
-    ssh:
-      key:
-        secret:
-          name: "NULL"
-      known:
-        hosts:
-          configmap:
-            name: "NULL"
-  image:
-    pull:
-      secrets: "NULL"
-  gcp:
-    service:
-      account:
-        keys: "NULL"
-  in:
-    cluster: "True"
-  affinity: "NULL"
-  tolerations: "NULL"
-  kube:
-    client:
-      request:
-        args: "{\\\"_request_timeout\\\" : [60,60] }"
-  run:
-    as:
-      user: "NULL"
-  fs:
-    group: "NULL"
+  delete_worker_pods:
+    "": "True"
+    on_failure: "False"
+  multi_namespace_mode: "False"
+  in_cluster: "True"
+  cluster_context: "NULL"
+  config_file: "NULL"
+  kube_client_request_args: "NULL"
+  delete_option_kwargs: "NULL"
+  enable_tcp_keepalive: "False"
+  tcp_keep:
+    idle: "120"
+    intvl: "30"
+    cnt: "6"
+
+<smart_sensor>:
+  use_smart_sensor: "False"
+  shard_code_upper_limit: "10000"
+  shards: "5"
+  sensors_enabled: "NamedHivePartitionSensor"
 
 <secrets>:
   backend:
     "": ""
     kwargs: ""
+
+<logging>:
+  base_log_folder: "=${AIRFLOW_HOME}/logs"
+  remote:
+    logging: "False"
+    log_conn_id: "NULL"
+    base_log_folder: "NULL"
+  google_key_path: "NULL"
+  encrypt_s3_logs: "False"
+  logging:
+    level: "INFO"
+    config_class: "NULL"
+  fab_logging_level: "WARN"
+  colored:
+    console_log: "True"
+    log_format: "[%%%%(blue)s%%%%(asctime)s%%%%(reset)s] {{%%%%(blue)s%%%%(filename)s:%%%%(reset)s%%%%(lineno)d\\}\\} %%%%(log_color)s%%%%(levelname)s%%%%(reset)s - %%%%(log_color)s%%%%(message)s%%%%(reset)s"
+    formatter_class: "airflow.utils.log.colored_log.CustomTTYColoredFormatter"
+  log:
+    format: "[%%%%(asctime)s] {{%%%%(filename)s:%%%%(lineno)d\\}\\} %%%%(levelname)s - %%%%(message)s"
+    filename_template: "{{ ti.dag_id \\}\\}/{{ ti.task_id \\}\\}/{{ ts \\}\\}/{{ try_number \\}\\}.log"
+    processor_filename_template: "{{ filename \\}\\}.log"
+  simple_log_format: "%%%%(asctime)s %%%%(levelname)s - %%%%(message)s"
+  dag_processor_manager_log_location: "=${AIRFLOW_HOME}/logs/dag_processor_manager/dag_processor_manager.log"
+  task_log:
+    reader: "task"
+    prefix_template: "NULL"
+  extra_loggers: "NULL"
+
+<metrics>:
+  statsd:
+    "on": "False"
+    host: "localhost"
+    port: "8125"
+    prefix: "airflow"
+    allow_list: "NULL"
+    datadog:
+      enabled: "False"
+      tags: "NULL"
+    custom_client_path: "NULL"
+  stat_name_handkler: "NULL"

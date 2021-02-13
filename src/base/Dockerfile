@@ -26,7 +26,13 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
                                                default-libmysqlclient-dev \
                                                libkrb5-dev \
                                                libsasl2-dev \
+                                               libldap2-dev \
+                                               libssl-dev \
                                                apt-transport-https \
+                                               build-essential \
+                                               unixodbc \
+                                               unixodbc-dev \
+                                               python-dev \
                                                kubectl && \
     rm -rf /var/lib/apt/lists/* && \
     addgroup airflow && adduser --disabled-password --gecos "" --ingroup airflow airflow && \
@@ -34,5 +40,5 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
     mkdir -p ${AIRFLOW_HOME} ${AIRFLOW_VIRTUALENV} && \
     pip3 install virtualenv psycopg2-binary && \
     virtualenv -p python3 ${AIRFLOW_VIRTUALENV} && \
-    ${AIRFLOW_VIRTUALENV}/bin/pip3 install "pymssql<3.0" statsd && \
+    ${AIRFLOW_VIRTUALENV}/bin/pip3 install statsd && \
     chmod +x ${AIRFLOW_USER_HOME}/airflow_entrypoint.sh ${AIRFLOW_USER_HOME}/airflow_config_loader.sh
